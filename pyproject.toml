@@ -4,7 +4,7 @@ version = "0.1.0"
 description = "A RESTful API for CRUD operations over files in current filesystem."
 authors = ["Renato Teixeira <rena2damas@gmail.com>"]
 license = "MIT"
-readme = "README.md"
+readme = "README.rst"
 packages = [
     { include = "*", from = "src" }
 ]
