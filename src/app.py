@@ -4,9 +4,9 @@ from apispec_plugins.webframeworks.flask import FlaskPlugin
 from flasgger import apispec_to_template, Swagger
 from flask import Blueprint, Flask, redirect, url_for
 
-from filexplorer import __meta__, __version__
-from filexplorer.settings import oas
-from filexplorer.settings.env import config_class, load_dotenv
+from src import __meta__, __version__
+from src.settings import oas
+from src.settings.env import config_class, load_dotenv
 
 
 def create_app(config_name="development", dotenv=True, configs=None):
