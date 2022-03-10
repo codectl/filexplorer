@@ -5,7 +5,6 @@ from flasgger import apispec_to_template, Swagger
 from flask import Blueprint, Flask, redirect, url_for
 
 from filexplorer import __meta__, __version__
-from src.resources.health_checks import blueprint as health_checks
 from src.settings import oas
 from src.settings.env import config_class, load_dotenv
 
@@ -33,7 +32,7 @@ def setup_app(app):
 
     # initial blueprint wiring
     index = Blueprint("index", __name__)
-    index.register_blueprint(health_checks)
+    # index.register_blueprint(health_checks)
     app.register_blueprint(index, url_prefix=url_prefix)
 
     # base template for OpenAPI specs
