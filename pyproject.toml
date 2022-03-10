@@ -1,0 +1,58 @@
+[tool.poetry]
+name = "monitoring-service"
+version = "0.1.0"
+description = "A service responsible for providing monitoring data."
+authors = ["Renato Teixeira <rena2damas@gmail.com>"]
+license = "MIT"
+readme = "README.md"
+packages = [
+    { include = "*", from = "src" }
+]
+homepage = ""
+repository = "https://github.com/rena2damas/monitoring-service"
+documentation = ""
+keywords = [
+    "monitoring",
+    "swagger",
+    "openapi",
+    "oas3",
+    "rest",
+    "api",
+    "web",
+    "flask",
+    "python",
+    "python3"
+]
+classifiers = [
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Natural Language :: English",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.7",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10"
+]
+
+[tool.poetry.dependencies]
+aenum = "^3.1.8"
+apispec = { extras = ["marshmallow", "yaml"], version = "^5.1.1" }
+apispec-plugins = "^0.1.1"
+environs = "^9.5.0"
+flasgger = "^0.9.5"
+Flask = "^2.0.3"
+Flask-RESTful = "*"
+gunicorn = "^20.1.0"
+python = "^3.7"
+requests = "^2.27.1"
+
+[tool.poetry.dev-dependencies]
+coverage = "^6.3.2"
+pre-commit = "^2.17.0"
+pytest = "^7.0.1"
+pytest-mock = "^3.7.0"
+requests-mock = "^1.9.3"
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
