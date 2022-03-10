@@ -2,7 +2,7 @@ from dataclasses import dataclass
 
 from apispec.ext.marshmallow import OpenAPIConverter, resolver
 
-from f.schemas.serlializers.http import HttpResponseSchema
+from src.schemas.serlializers.http import HttpResponseSchema
 
 
 @dataclass
