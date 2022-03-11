@@ -54,7 +54,10 @@ def setup_app(app):
             )
         ],
         responses=[
-            oas.HttpResponse(code=404, reason="NotFound", description="Not Found")
+            oas.HttpResponse(
+                code=401, reason="Unauthorized", description="Unauthorized"
+            ),
+            oas.HttpResponse(code=404, reason="NotFound", description="Not Found"),
         ],
     )
 
