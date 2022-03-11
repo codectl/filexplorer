@@ -4,7 +4,6 @@ __all__ = ("AuthAPI",)
 
 
 class AuthAPI:
-
     def __init__(self):
         self._conn = pam.pam()
 
