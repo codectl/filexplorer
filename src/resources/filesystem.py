@@ -20,6 +20,8 @@ class Filesystem(Resource):
           description: the path to list content from
         tags:
             - filesystem
+        security:
+            - BasicAuth
         responses:
             200:
                 description: Ok
