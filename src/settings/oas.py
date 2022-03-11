@@ -50,7 +50,7 @@ def base_template(
         "servers": servers,
         "tags": tags,
         "components": {
-            "securitySchemes": [{auth.__name__: asdict(auth())} for auth in auths],
+            "securitySchemes": {**{auth.__name__: asdict(auth()) for auth in auths}},
             "responses": {
                 response.reason: {
                     "description": response.description,
