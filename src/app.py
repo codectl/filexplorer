@@ -46,6 +46,7 @@ def setup_app(app):
             "description": __meta__["summary"],
         },
         servers=[oas.Server(url=url_prefix, description=app.config["ENV"])],
+        auths=[oas.AuthSchemes.BasicAuth],
         tags=[
             oas.Tag(
                 name="filesystem",
