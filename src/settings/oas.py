@@ -1,4 +1,4 @@
-from dataclasses import asdict, dataclass, fields
+from dataclasses import asdict, dataclass
 
 from apispec.ext.marshmallow import OpenAPIConverter, resolver
 
