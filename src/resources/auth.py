@@ -1,6 +1,6 @@
 from functools import wraps
 
-from flask import request
+from flask import jsonify, make_response, request
 
 from src.api.auth import AuthAPI
 
@@ -16,11 +16,11 @@ def requires_auth(schemes=("basic")):
         def decorated(*args, **kwargs):
             if "basic" in schemes:
                 auth = request.authorization
-                if not auth and not AuthAPI().authenticate(
+                if not auth or not AuthAPI().authenticate(
                         username=auth.username,
                         password=auth.password
                 ):
-                    abort(401, code=401, reason="Unauthorized")
+                    return make_response({"code": 401, "reason": "Unauthorized"}, 401)
             elif "bearer" in schemes:
                 raise NotImplemented()
             elif "digest" in schemes:
