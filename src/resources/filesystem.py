@@ -7,14 +7,21 @@ api = Api(blueprint)
 
 @api.resource("/<path:path>", endpoint="filesystem")
 class Filesystem(Resource):
-    def get(self):
+    def get(self, path):
         """
-        List content.
+        List content in given path.
         ---
+        parameters:
+        - in: path
+          name: path
+          schema:
+            type: string
+          required: true
+          description: the path to list content from
         tags:
             - filesystem
         responses:
             200:
                 description: Ok
         """
-        return "ok"
+        return path
