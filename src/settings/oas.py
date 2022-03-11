@@ -1,4 +1,4 @@
-from dataclasses import dataclass
+from dataclasses import asdict, dataclass, fields
 
 from apispec.ext.marshmallow import OpenAPIConverter, resolver
 
@@ -24,6 +24,14 @@ class HttpResponse:
     description: str
 
 
+class AuthSchemes:
+
+    @dataclass
+    class BasicAuth:
+        type: str = "http"
+        scheme: str = "basic"
+
+
 def create_spec_converter(openapi_version):
     return OpenAPIConverter(
         openapi_version=openapi_version,
@@ -32,7 +40,8 @@ def create_spec_converter(openapi_version):
     )
 
 
-def base_template(openapi_version, info=None, servers=(), tags=(), responses=()):
+def base_template(openapi_version, info=None, servers=(), auths=(), tags=(),
+                  responses=()):
     """Base OpenAPI template."""
     global converter
     return {
@@ -41,6 +50,9 @@ def base_template(openapi_version, info=None, servers=(), tags=(), responses=())
         "servers": servers,
         "tags": tags,
         "components": {
+            "securitySchemes": [{
+                auth.__name__: asdict(auth())
+            } for auth in auths],
             "responses": {
                 response.reason: {
                     "description": response.description,
@@ -56,9 +68,7 @@ def base_template(openapi_version, info=None, servers=(), tags=(), responses=())
                 resolver(HttpResponseSchema): {
                     **converter.schema2jsonschema(schema=HttpResponseSchema)
                 }
-            }
-            if responses
-            else {},
+            } if responses else {},
         },
     }
 
