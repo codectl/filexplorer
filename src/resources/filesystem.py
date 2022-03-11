@@ -1,5 +1,8 @@
-from flask import Blueprint, jsonify
-from flask_restful import abort, Api, Resource
+from flask import Blueprint
+from flask_restful import Api, Resource
+
+from src.resources.auth import requires_auth
+
 
 blueprint = Blueprint("filesystem", __name__, url_prefix="/filesystem")
 api = Api(blueprint)
@@ -7,6 +10,7 @@ api = Api(blueprint)
 
 @api.resource("/<path:path>", endpoint="filesystem")
 class Filesystem(Resource):
+    @requires_auth(schemes=["basic"])
     def get(self, path):
         """
         List content in given path.
@@ -21,9 +25,17 @@ class Filesystem(Resource):
         tags:
             - filesystem
         security:
-            - BasicAuth
+            - BasicAuth: []
         responses:
             200:
                 description: Ok
+                content:
+                    text/plain:
+                        schema:
+                            type: string
+            401:
+                $ref: '#/components/responses/Unauthorized'
+            404:
+                $ref: '#/components/responses/NotFound'
         """
         return path
