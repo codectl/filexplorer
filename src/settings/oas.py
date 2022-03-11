@@ -25,7 +25,6 @@ class HttpResponse:
 
 
 class AuthSchemes:
-
     @dataclass
     class BasicAuth:
         type: str = "http"
@@ -40,8 +39,9 @@ def create_spec_converter(openapi_version):
     )
 
 
-def base_template(openapi_version, info=None, servers=(), auths=(), tags=(),
-                  responses=()):
+def base_template(
+    openapi_version, info=None, servers=(), auths=(), tags=(), responses=()
+):
     """Base OpenAPI template."""
     global converter
     return {
@@ -50,9 +50,7 @@ def base_template(openapi_version, info=None, servers=(), auths=(), tags=(),
         "servers": servers,
         "tags": tags,
         "components": {
-            "securitySchemes": [{
-                auth.__name__: asdict(auth())
-            } for auth in auths],
+            "securitySchemes": [{auth.__name__: asdict(auth())} for auth in auths],
             "responses": {
                 response.reason: {
                     "description": response.description,
@@ -68,7 +66,9 @@ def base_template(openapi_version, info=None, servers=(), auths=(), tags=(),
                 resolver(HttpResponseSchema): {
                     **converter.schema2jsonschema(schema=HttpResponseSchema)
                 }
-            } if responses else {},
+            }
+            if responses
+            else {},
         },
     }
 
