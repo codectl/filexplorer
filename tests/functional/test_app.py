@@ -3,7 +3,7 @@ import pytest
 from src.app import create_app
 
 
-@pytest.fixture(scope="class")
+@pytest.fixture(scope="function")
 def local_app():
     app = create_app(
         config_name="testing",
@@ -46,3 +46,9 @@ class TestApp:
 
         response = client.get("/test/v1/swagger.json")
         assert response.status_code == 200
+
+    def test_missing_resource_returns_404(self, client):
+        """Ensure app returns 404 when resource does not exist."""
+        response = client.get("/invalid")
+        assert response.status_code == 404
+
