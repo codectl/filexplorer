@@ -38,4 +38,10 @@ class Filesystem(Resource):
             404:
                 $ref: '#/components/responses/NotFound'
         """
-        return path
+        return f"/{path}"
+
+
+@api.resource("/supported-paths", endpoint="supported-paths")
+class SupportedPaths(Resource):
+    def get(self):
+        return []
