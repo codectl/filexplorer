@@ -23,16 +23,16 @@ class TestApp:
         """Ensure app is created."""
         assert app is not None
 
-    def test_root_path(self, client):
+    def test_root_path_returns_200(self, client):
         response = client.get("/")
         assert response.status_code == 200
 
-    def test_swagger_apidocs(self, client):
+    def test_swagger_apidocs_returns_200(self, client):
         """Ensure app serves swagger specs."""
         response = client.get("/swagger.json")
         assert response.status_code == 200
 
-    def test_url_application_root(self, local_app):
+    def test_url_application_root_returns_200(self, local_app):
         """Ensure root path is redirected to application root."""
         client = local_app.test_client()
 
