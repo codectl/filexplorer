@@ -6,4 +6,4 @@ __all__ = ("AuthAPI",)
 class AuthAPI:
     @staticmethod
     def authenticate(username, password):
-        return pam.authenticate(username, password)
+        return pam.authenticate(username, password) == pam.PAM_SUCCESS
