@@ -2,7 +2,7 @@
 name = "filexplorer"
 version = "0.1.0"
 description = "A RESTful API for CRUD operations over files in current filesystem."
-authors = ["Renato Teixeira <rena2damas@gmail.com>"]
+authors = ["Renato Damas <rena2damas@gmail.com>"]
 license = "MIT"
 readme = "README.rst"
 packages = [
@@ -37,6 +37,7 @@ classifiers = [
 [tool.poetry.dependencies]
 apispec = { extras = ["marshmallow", "yaml"], version = "^5.1.1" }
 apispec-plugins = "^0.1.1"
+apispec-ui = "^0.1.0"
 environs = "^9.5.0"
 flasgger = "^0.9.5"
 Flask = "^2.0.3"
