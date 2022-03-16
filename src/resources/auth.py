@@ -1,6 +1,7 @@
 from functools import wraps
 
-from flask import make_response, request
+from flask import request
+from flask_restful import abort
 
 from src.api.auth import AuthAPI
 
@@ -12,10 +13,7 @@ def requires_auth(schemes=("basic",)):
     def wrapper(func):
         @wraps(func)
         def decorated(*args, **kwargs):
-            unauthorized = make_response({"code": 401, "reason": "Unauthorized"}, 401)
-            if not schemes:
-                return unauthorized
-            elif "basic" in schemes:
+            if "basic" in schemes:
                 auth = request.authorization
                 if auth and AuthAPI.authenticate(
                         username=auth.username,
@@ -24,7 +22,8 @@ def requires_auth(schemes=("basic",)):
                     return func(*args, **kwargs)
             elif "bearer" in schemes:
                 raise NotImplementedError
-            return unauthorized
+
+            abort(401, code=401, reason="Unauthorized")
 
         return decorated
 
