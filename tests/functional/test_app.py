@@ -29,7 +29,7 @@ class TestApp:
 
     def test_swagger_apidocs_returns_200(self, client):
         """Ensure app serves swagger specs."""
-        response = client.get("/swagger.json")
+        response = client.get("/specs.json")
         assert response.status_code == 200
 
     def test_url_application_root_returns_200(self, local_app):
@@ -44,7 +44,7 @@ class TestApp:
         assert response.status_code == 200
         assert request.path.rstrip("/") == "/test/v1"
 
-        response = client.get("/test/v1/swagger.json")
+        response = client.get("/test/v1/specs.json")
         assert response.status_code == 200
 
     def test_missing_resource_returns_404(self, client):
