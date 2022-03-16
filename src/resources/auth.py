@@ -14,7 +14,7 @@ def requires_auth(schemes=("basic")):
         def decorated(*args, **kwargs):
             if "basic" in schemes:
                 auth = request.authorization
-                if not auth or not AuthAPI().authenticate(
+                if not auth or not AuthAPI.authenticate(
                     username=auth.username, password=auth.password
                 ):
                     return make_response({"code": 401, "reason": "Unauthorized"}, 401)
