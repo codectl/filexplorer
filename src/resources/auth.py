@@ -16,8 +16,7 @@ def requires_auth(schemes=("basic",)):
             if "basic" in schemes:
                 auth = request.authorization
                 if auth and AuthAPI.authenticate(
-                        username=auth.username,
-                        password=auth.password
+                    username=auth.username, password=auth.password
                 ):
                     return func(*args, **kwargs)
             elif "bearer" in schemes:

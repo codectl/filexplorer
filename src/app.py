@@ -59,7 +59,7 @@ def setup_app(app):
         responses=[
             oas.HttpResponse(code=401, reason=HTTP_STATUS_CODES[401]),
             oas.HttpResponse(code=404, reason=HTTP_STATUS_CODES[404]),
-        ]
+        ],
     )
 
     spec = APISpec(
@@ -81,7 +81,9 @@ def setup_app(app):
     app.add_url_rule("/", "index", view_func=lambda: redirect(url_for("swagger.ui")))
 
     # jsonify http errors
-    app.register_error_handler(HTTPException, lambda ex: jsonify(oas.HttpResponse(
-        code=ex.code,
-        reason=HTTP_STATUS_CODES[ex.code]
-    )))
+    app.register_error_handler(
+        HTTPException,
+        lambda ex: jsonify(
+            oas.HttpResponse(code=ex.code, reason=HTTP_STATUS_CODES[ex.code])
+        ),
+    )
