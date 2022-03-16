@@ -67,7 +67,6 @@ def setup_app(app):
         version=__version__,
         openapi_version=openapi_version,
         plugins=(FlaskPlugin(), MarshmallowPlugin()),
-        basePath=url_prefix,
         **spec_template
     )
 
