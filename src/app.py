@@ -1,7 +1,8 @@
 from apispec import APISpec
 from apispec.ext.marshmallow import MarshmallowPlugin
 from apispec_plugins.webframeworks.flask import FlaskPlugin
-from flasgger import apispec_to_template, Swagger
+from apispec_ui.flask import Swagger
+
 from flask import Blueprint, Flask, redirect, url_for
 
 from src import __meta__, __version__
@@ -74,17 +75,13 @@ def setup_app(app):
     for view in app.view_functions.values():
         spec.path(view=view, app=app, base_path=url_prefix)
 
-    # generate swagger from spec
     Swagger(
         app=app,
-        config=oas.swagger_configs(
-            openapi_version=openapi_version, app_root=url_prefix
-        ),
-        template=apispec_to_template(app=app, spec=spec),
-        merge=True,
+        apispec=spec,
+        config={}
     )
 
     # redirect root path to context root
     app.add_url_rule(
-        "/", "index", view_func=lambda: redirect(url_for("flasgger.apidocs"))
+        "/", "index", view_func=lambda: redirect(url_for("swagger.ui"))
     )
