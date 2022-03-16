@@ -83,7 +83,8 @@ def setup_app(app):
     # jsonify http errors
     app.register_error_handler(
         HTTPException,
-        lambda ex: jsonify(
-            oas.HttpResponse(code=ex.code, reason=HTTP_STATUS_CODES[ex.code])
+        lambda ex: (
+            jsonify(oas.HttpResponse(code=ex.code, reason=HTTP_STATUS_CODES[ex.code])),
+            ex.code,
         ),
     )
