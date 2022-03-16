@@ -12,15 +12,19 @@ def requires_auth(schemes=("basic")):
     def wrapper(func):
         @wraps(func)
         def decorated(*args, **kwargs):
-            if "basic" in schemes:
+            unauthorized = make_response({"code": 401, "reason": "Unauthorized"}, 401)
+            if not schemes:
+                return unauthorized
+            elif "basic" in schemes:
                 auth = request.authorization
-                if not auth or not AuthAPI.authenticate(
-                    username=auth.username, password=auth.password
+                if auth and AuthAPI.authenticate(
+                        username=auth.username,
+                        password=auth.password
                 ):
-                    return make_response({"code": 401, "reason": "Unauthorized"}, 401)
+                    return func(*args, **kwargs)
             elif "bearer" in schemes:
                 raise NotImplementedError
-            return func(*args, **kwargs)
+            return unauthorized
 
         return decorated
 
