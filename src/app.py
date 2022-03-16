@@ -75,6 +75,7 @@ def setup_app(app):
     for view in app.view_functions.values():
         spec.path(view=view, app=app, base_path=url_prefix)
 
+    # create views for Swagger
     Swagger(app=app, apispec=spec, config=oas.swagger_configs(app_root=url_prefix))
 
     # redirect root path to context root
