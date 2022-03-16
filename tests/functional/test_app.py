@@ -51,4 +51,3 @@ class TestApp:
         """Ensure app returns 404 when resource does not exist."""
         response = client.get("/invalid")
         assert response.status_code == 404
-
