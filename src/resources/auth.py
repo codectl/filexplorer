@@ -5,7 +5,7 @@ from flask import make_response, request
 from src.api.auth import AuthAPI
 
 
-def requires_auth(schemes=("basic")):
+def requires_auth(schemes=("basic",)):
     """Validate endpoint against given authorization schemes.
     Fail if authorization properties are missing or are invalid."""
 
