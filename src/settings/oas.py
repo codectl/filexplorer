@@ -21,7 +21,6 @@ class Server:
 class HttpResponse:
     code: int
     reason: str
-    description: str
 
 
 class AuthSchemes:
@@ -52,8 +51,7 @@ def base_template(
         "components": {
             "securitySchemes": {**{auth.__name__: asdict(auth()) for auth in auths}},
             "responses": {
-                response.reason: {
-                    "description": response.description,
+                response.reason.replace(" ", ""): {
                     "content": {
                         "application/json": {
                             "schema": {"$ref": "#/components/schemas/HttpResponse"}
