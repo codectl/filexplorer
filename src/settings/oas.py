@@ -73,22 +73,11 @@ def base_template(
     }
 
 
-def swagger_configs(openapi_version, app_root=""):
+def swagger_configs(app_root="/"):
     prefix = "" if app_root == "/" else app_root
     return {
-        "openapi": openapi_version,
-        "specs": [
-            {
-                "endpoint": "swagger",
-                "route": prefix + "/swagger.json",
-                "rule_filter": lambda rule: True,
-                "model_filter": lambda tag: True,
-            }
-        ],
-        # where to find the docs (ensure trailing slash)
-        "specs_route": prefix + "/",
-        # swagger static files
-        "static_url_path": prefix + "/static",
-        # hide the Swagger top bar
-        "hide_top_bar": True,
+        "swagger_route": prefix + "/",
+        "swagger_static": prefix + "/",
+        "swagger_favicon": "favicon.ico",
+        "swagger_hide_bar": True,
     }

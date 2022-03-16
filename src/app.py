@@ -75,7 +75,7 @@ def setup_app(app):
     for view in app.view_functions.values():
         spec.path(view=view, app=app, base_path=url_prefix)
 
-    Swagger(app=app, apispec=spec, config={})
+    Swagger(app=app, apispec=spec, config=oas.swagger_configs(app_root=url_prefix))
 
     # redirect root path to context root
     app.add_url_rule("/", "index", view_func=lambda: redirect(url_for("swagger.ui")))
