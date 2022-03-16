@@ -51,7 +51,7 @@ def setup_app(app):
         tags=[
             oas.Tag(
                 name="filesystem",
-                description="CRUD operations over files in current filesystem",
+                description="CRUD operations over files in the current filesystem",
             )
         ],
         responses=[
