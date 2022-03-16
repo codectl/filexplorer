@@ -1,7 +1,6 @@
 from dataclasses import asdict, dataclass
 
 from apispec.ext.marshmallow import OpenAPIConverter, resolver
-from flask import url_for
 
 from src.schemas.serlializers.http import HttpResponseSchema
 
@@ -78,7 +77,7 @@ def swagger_configs(app_root="/"):
     prefix = "" if app_root == "/" else app_root
     return {
         "swagger_route": prefix + "/",
-        "swagger_static":  "/static/",
-        "swagger_favicon": url_for("favicon.ico"),
+        "swagger_static": "/static/",
+        "swagger_favicon": "favicon.ico",
         "swagger_hide_bar": True,
     }
