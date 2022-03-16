@@ -4,8 +4,7 @@ __all__ = ("AuthAPI",)
 
 
 class AuthAPI:
-    def __init__(self):
-        self._conn = pam.pam()
 
-    def authenticate(self, username, password):
-        return self._conn.authenticate(username, password)
+    @staticmethod
+    def authenticate(username, password):
+        return pam.authenticate(username, password)
