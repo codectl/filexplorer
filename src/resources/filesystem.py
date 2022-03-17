@@ -30,9 +30,10 @@ class Filesystem(Resource):
         responses:
             200:
                 description: Ok
-                content:
-                    text/plain:
-                        schema:
+                application/json:
+                    schema:
+                        type: array
+                        items:
                             type: string
             400:
                 $ref: '#/components/responses/BadRequest'
@@ -41,13 +42,14 @@ class Filesystem(Resource):
             404:
                 $ref: '#/components/responses/NotFound'
         """
-        username = current_username
         path = f"/{path}"
+        username = current_username
+        fs_api = FilesystemAPI(username=username)
         try:
-            result = FilesystemAPI(username=username).ls(path=path)
+            result = fs_api.ls(path=path)
         except Exception:
             abort(404, code=404, reason=HTTP_STATUS_CODES[404])
-        return Response(result, mimetype=request.headers["Accept"])
+        return jsonify(result)
 
 
 @api.resource("/supported-paths", endpoint="supported-paths")

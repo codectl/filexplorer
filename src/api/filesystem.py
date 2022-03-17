@@ -21,7 +21,7 @@ class FilesystemAPI:
         process = self._shell.run(self.sudo(command))
         if process.code > 0:
             raise CommandError(process.errors(raw=True))
-        return process.output(raw=True)
+        return process.output()
 
     @staticmethod
     def supported_paths():
