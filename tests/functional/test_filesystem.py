@@ -4,6 +4,7 @@ import pytest
 from shell import Shell
 
 from src.api.auth import AuthAPI
+from tests.utils import MockShell
 
 
 @pytest.fixture()
