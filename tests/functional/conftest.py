@@ -14,7 +14,7 @@ def app():
             "APPLICATION_ROOT": "/",
             "SUPPORTED_MEASURABLES": ["foo", "bar"],
             "OPENAPI": "3.0.3",  # default version
-            "SUPPORTED_PATHS": ["/tmp"]
+            "SUPPORTED_PATHS": ["/tmp"],
         },
     )
     with app.test_request_context():

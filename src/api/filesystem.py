@@ -5,7 +5,6 @@ __all__ = ("FilesystemAPI",)
 
 
 class FilesystemAPI:
-
     def __init__(self, username=None):
         self.username = username
         self._shell = Shell()
