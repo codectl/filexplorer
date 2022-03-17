@@ -10,11 +10,14 @@ class BaseConfig:
     DEBUG = False
     TESTING = False
 
-    # Application root context
+    # application root context
     APPLICATION_ROOT = env.str("APPLICATION_ROOT", "/")
 
     # OPENAPI supported version
-    OPENAPI = env("OPENAPI", "3.0.3")
+    OPENAPI = env.str("OPENAPI", "3.0.3")
+
+    # supported queryable paths
+    SUPPORTED_PATHS = env.list("SUPPORTED_PATHS", [])
 
 
 @dataclass

@@ -1,8 +1,9 @@
-from flask import Blueprint
-from flask_restful import Api, Resource
+from flask import Blueprint, jsonify, request, Response
+from flask_restful import abort, Api, Resource
+from werkzeug.http import HTTP_STATUS_CODES
 
+from src.api.filesystem import FilesystemAPI
 from src.resources.auth import current_username, requires_auth
-
 
 blueprint = Blueprint("filesystem", __name__, url_prefix="/filesystem")
 api = Api(blueprint)
@@ -41,10 +42,30 @@ class Filesystem(Resource):
                 $ref: '#/components/responses/NotFound'
         """
         username = current_username
-        return f"/{path}"
+        path = f"/{path}"
+        try:
+            result = FilesystemAPI(username=username).ls(path=path)
+        except Exception:
+            abort(404, code=404, reason=HTTP_STATUS_CODES[404])
+        return Response(result, mimetype=request.headers["Accept"])
 
 
 @api.resource("/supported-paths", endpoint="supported-paths")
 class SupportedPaths(Resource):
     def get(self):
-        return []
+        """
+        List content in given path.
+        ---
+        tags:
+            - filesystem
+        responses:
+            200:
+                description: Ok
+                content:
+                    application/json:
+                        schema:
+                            type: array
+                            items:
+                                type: string
+        """
+        return jsonify(FilesystemAPI.supported_paths())
