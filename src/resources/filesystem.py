@@ -1,4 +1,4 @@
-from flask import Blueprint, jsonify, request, Response
+from flask import Blueprint, jsonify
 from flask_restful import abort, Api, Resource
 from werkzeug.http import HTTP_STATUS_CODES
 
