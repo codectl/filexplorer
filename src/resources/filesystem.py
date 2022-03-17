@@ -1,5 +1,6 @@
 from flask import Blueprint, jsonify
 from flask_restful import abort, Api, Resource
+from shell import CommandError
 from werkzeug.http import HTTP_STATUS_CODES
 
 from src.api.filesystem import FilesystemAPI
@@ -49,7 +50,7 @@ class Filesystem(Resource):
             abort(400, code=400, reason=HTTP_STATUS_CODES[400])
         try:
             result = fs_api.ls(path=path)
-        except Exception:
+        except CommandError:
             abort(404, code=404, reason=HTTP_STATUS_CODES[404])
         return jsonify(result)
 
