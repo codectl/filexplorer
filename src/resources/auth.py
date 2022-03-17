@@ -1,9 +1,14 @@
 from functools import wraps
 
-from flask import request
+from flask import g, request
 from flask_restful import abort
+from werkzeug.local import LocalProxy
 
 from src.api.auth import AuthAPI
+
+
+# proxy to get username from g
+current_username = LocalProxy(lambda: g.username)
 
 
 def requires_auth(schemes=("basic",)):
@@ -18,6 +23,7 @@ def requires_auth(schemes=("basic",)):
                 if auth and AuthAPI.authenticate(
                     username=auth.username, password=auth.password
                 ):
+                    g.username = auth.username
                     return func(*args, **kwargs)
             elif "bearer" in schemes:
                 raise NotImplementedError
