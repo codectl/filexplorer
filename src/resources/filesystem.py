@@ -1,7 +1,7 @@
 from flask import Blueprint
 from flask_restful import Api, Resource
 
-from src.resources.auth import requires_auth
+from src.resources.auth import current_username, requires_auth
 
 
 blueprint = Blueprint("filesystem", __name__, url_prefix="/filesystem")
@@ -33,11 +33,14 @@ class Filesystem(Resource):
                     text/plain:
                         schema:
                             type: string
+            400:
+                $ref: '#/components/responses/BadRequest'
             401:
                 $ref: '#/components/responses/Unauthorized'
             404:
                 $ref: '#/components/responses/NotFound'
         """
+        username = current_username
         return f"/{path}"
 
 
