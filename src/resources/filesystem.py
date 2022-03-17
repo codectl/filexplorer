@@ -45,6 +45,8 @@ class Filesystem(Resource):
         path = f"/{path}"
         username = current_username
         fs_api = FilesystemAPI(username=username)
+        if not any(path.startswith(p) for p in fs_api.supported_paths()):
+            abort(400, code=400, reason=HTTP_STATUS_CODES[400])
         try:
             result = fs_api.ls(path=path)
         except Exception:
