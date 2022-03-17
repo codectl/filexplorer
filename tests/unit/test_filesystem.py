@@ -10,8 +10,11 @@ def api():
 
 
 class TestFilesystemAPI:
-    def test_supported_paths(self):
+    def test_supported_paths(self, api):
         app = Flask(__name__)
         app.config["SUPPORTED_PATHS"] = ["/test"]
         with app.test_request_context():
-            assert FilesystemAPI.supported_paths() == ["/test"]
+            assert api.supported_paths() == ["/test"]
+
+    def test_ls(self, api):
+        assert api.ls(path="/test")

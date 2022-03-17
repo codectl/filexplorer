@@ -1,17 +1,9 @@
 from base64 import b64encode
-from dataclasses import dataclass
 
 import pytest
 from shell import Shell
 
 from src.api.auth import AuthAPI
-
-
-@dataclass
-class MockShell:
-    code: int = 0
-    output = lambda *args, **kwargs: ""
-    errors = lambda *args, **kwargs: ""
 
 
 @pytest.fixture()
