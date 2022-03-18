@@ -37,11 +37,11 @@ class Filesystem(Resource):
                         items:
                             type: string
             400:
-                $ref: '#/components/responses/BadRequest'
+                $ref: "#/components/responses/BadRequest"
             401:
-                $ref: '#/components/responses/Unauthorized'
+                $ref: "#/components/responses/Unauthorized"
             404:
-                $ref: '#/components/responses/NotFound'
+                $ref: "#/components/responses/NotFound"
         """
         path = f"/{path}"
         username = current_username
