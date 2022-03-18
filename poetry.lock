@@ -46,20 +46,17 @@ flask = ["Flask (>=2.0.3,<3.0.0)"]
 
 [[package]]
 name = "apispec-ui"
-version = "0.1.1"
+version = "0.1.2"
 description = "Generate UI interactive API's from APISpec specifications."
 category = "main"
 optional = false
-python-versions = "^3.7"
-develop = false
+python-versions = ">=3.7,<4.0"
 
 [package.dependencies]
-environs = "^9.5.0"
-gunicorn = "^20.1.0"
-
-[package.source]
-type = "directory"
-url = "../apispec-ui"
+apispec = {version = ">=5.1.1,<6.0.0", extras = ["yaml"]}
+environs = ">=9.5.0,<10.0.0"
+Flask = ">=2.0.3,<3.0.0"
+gunicorn = ">=20.1.0,<21.0.0"
 
 [[package]]
 name = "atomicwrites"
@@ -530,7 +527,7 @@ testing = ["pytest (>=6)", "pytest-checkdocs (>=2.4)", "pytest-flake8", "pytest-
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.7"
-content-hash = "79d67343b5b60d0c5af50f5a51ffdeb2631a538021adc910d5825a2b35c0a369"
+content-hash = "79ffbf8d5c74877af863ba7285edbac02402bc09197278c4407ba3237c807172"
 
 [metadata.files]
 aniso8601 = [
@@ -545,7 +542,10 @@ apispec-plugins = [
     {file = "apispec-plugins-0.1.2.tar.gz", hash = "sha256:cee77975a601d9bdd3f312ed7528c627db589ff34bb4475eedafaec845b35d8f"},
     {file = "apispec_plugins-0.1.2-py3-none-any.whl", hash = "sha256:49f8d7d2f917b9a46b276c76d1d982ba85746826f779da268780a0844c553552"},
 ]
-apispec-ui = []
+apispec-ui = [
+    {file = "apispec-ui-0.1.2.tar.gz", hash = "sha256:8546bb0c5b9a4a1c5ede4ac9a42f0e6b90580c12ff4050586a3877663c09b479"},
+    {file = "apispec_ui-0.1.2-py3-none-any.whl", hash = "sha256:a36be49bc00e34f943d266a59290246434afeb8a7203ef68e46fb723ff79c408"},
+]
 atomicwrites = [
     {file = "atomicwrites-1.4.0-py2.py3-none-any.whl", hash = "sha256:6d1784dea7c0c8d4a5172b6c620f40b6e4cbfdf96d783691f2e1302a7b88e197"},
     {file = "atomicwrites-1.4.0.tar.gz", hash = "sha256:ae70396ad1a434f9c7046fd2dd196fc04b12f9e91ffb859164193be8b6168a7a"},
