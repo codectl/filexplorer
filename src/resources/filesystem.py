@@ -10,7 +10,7 @@ blueprint = Blueprint("filesystem", __name__, url_prefix="/filesystem")
 api = Api(blueprint)
 
 
-@api.resource("/<path:path>", endpoint="filesystem")
+@api.resource("/<path:path>", "//<path:path>", endpoint="filesystem2")
 class Filesystem(Resource):
     @requires_auth(schemes=["basic"])
     def get(self, path):
