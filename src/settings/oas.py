@@ -21,6 +21,7 @@ class Server:
 class HttpResponse:
     code: int
     reason: str
+    message: str = ""
 
 
 class AuthSchemes:
