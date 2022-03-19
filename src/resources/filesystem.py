@@ -47,11 +47,13 @@ class Filesystem(Resource):
         username = current_username
         fs_api = FilesystemAPI(username=username)
         if not any(path.startswith(p) for p in fs_api.supported_paths()):
-            abort(400, code=400, reason=HTTP_STATUS_CODES[400])
+            abort(
+                400, code=400, reason=HTTP_STATUS_CODES[400], message="Unsupported path"
+            )
         try:
             result = fs_api.ls(path=path)
-        except CommandError:
-            abort(404, code=404, reason=HTTP_STATUS_CODES[404])
+        except CommandError as ex:
+            abort(400, code=400, reason=HTTP_STATUS_CODES[400], message=str(ex))
         return jsonify(result)
 
 
