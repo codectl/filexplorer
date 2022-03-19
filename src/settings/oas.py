@@ -4,6 +4,16 @@ from apispec.ext.marshmallow import OpenAPIConverter, resolver
 
 from src.schemas.serlializers.http import HttpResponseSchema
 
+__all__ = (
+    "Tag",
+    "Server",
+    "HttpResponse",
+    "AuthSchemes",
+    "create_spec_converter",
+    "base_template",
+    "swagger_configs",
+)
+
 
 @dataclass
 class Tag:
