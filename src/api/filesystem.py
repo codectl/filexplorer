@@ -1,13 +1,33 @@
-from flask import current_app
-from shell import CommandError, Shell
+import typing
 
-__all__ = ("FilesystemAPI",)
+from flask import current_app
+from shell import CommandError, shell
+
+from src import utils
+
+__all__ = (
+    "DefaultException",
+    "FileNotFoundException",
+    "PermissionDeniedException",
+    "FilesystemAPI",
+)
+
+
+class DefaultException(CommandError):
+    pass
+
+
+class FileNotFoundException(CommandError):
+    pass
+
+
+class PermissionDeniedException(CommandError):
+    pass
 
 
 class FilesystemAPI:
     def __init__(self, username=None):
         self.username = username
-        self._shell = Shell()
 
     def ls(self, path):
         command = f"ls {path}"
@@ -17,10 +37,20 @@ class FilesystemAPI:
         return f"sudo -u {self.username} {command}"
 
     def _run(self, command):
-        process = self._shell.run(self.sudo(command))
+        process = shell(self.sudo(command))
         if process.code > 0:
-            raise CommandError(process.errors(raw=True))
+            error = utils.clean_sh_error(process.errors(raw=True))
+            raise self.raise_error(error)(error)
         return process.output()
+
+    @staticmethod
+    def raise_error(error) -> typing.Type[CommandError]:
+        if "No such file or directory" == error:
+            return FileNotFoundException
+        elif "Permission denied" == error:
+            return PermissionDeniedException
+        else:
+            return DefaultException
 
     @staticmethod
     def supported_paths():
