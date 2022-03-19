@@ -6,7 +6,7 @@ from src.api.filesystem import (
     DefaultException,
     FileNotFoundException,
     PermissionDeniedException,
-    FilesystemAPI
+    FilesystemAPI,
 )
 from src.resources.auth import current_username, requires_auth
 

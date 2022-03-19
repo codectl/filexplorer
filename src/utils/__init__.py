@@ -9,8 +9,10 @@ def clean_sh_error(error):
     return error.split(":")[-1].strip()
 
 
-def http_response(code: int, serialize=True, **kwargs):
-    response = oas.HttpResponse(code=code, reason=HTTP_STATUS_CODES[code])
+def http_response(code: int, message="", serialize=True, **kwargs):
+    response = oas.HttpResponse(
+        code=code, reason=HTTP_STATUS_CODES[code], message=message
+    )
     if serialize:
         return HttpResponseSchema(**kwargs).dump(response)
     return response
