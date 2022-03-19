@@ -4,11 +4,9 @@ from apispec_plugins.webframeworks.flask import FlaskPlugin
 from apispec_ui.flask import Swagger
 from flask import Blueprint, Flask, redirect, url_for
 from werkzeug.exceptions import HTTPException
-from werkzeug.http import HTTP_STATUS_CODES
 
-from src import __meta__, __version__
+from src import __meta__, __version__, utils
 from src.resources.filesystem import blueprint as filesystem
-from src.schemas.serlializers.http import HttpResponseSchema
 from src.settings import oas
 from src.settings.env import config_class, load_dotenv
 
@@ -58,10 +56,10 @@ def setup_app(app):
             )
         ],
         responses=[
-            oas.HttpResponse(code=400, reason=HTTP_STATUS_CODES[400]),
-            oas.HttpResponse(code=401, reason=HTTP_STATUS_CODES[401]),
-            oas.HttpResponse(code=403, reason=HTTP_STATUS_CODES[403]),
-            oas.HttpResponse(code=404, reason=HTTP_STATUS_CODES[404]),
+            utils.http_response(code=400, serialize=False),
+            utils.http_response(code=401, serialize=False),
+            utils.http_response(code=403, serialize=False),
+            utils.http_response(code=404, serialize=False),
         ],
     )
 
@@ -84,13 +82,7 @@ def setup_app(app):
     app.add_url_rule("/", "index", view_func=lambda: redirect(url_for("swagger.ui")))
 
     # jsonify http errors
-    schema = HttpResponseSchema(only=("code", "reason"))
     app.register_error_handler(
         HTTPException,
-        lambda ex: (
-            schema.dump(
-                oas.HttpResponse(code=ex.code, reason=HTTP_STATUS_CODES[ex.code])
-            ),
-            ex.code,
-        ),
+        lambda ex: (utils.http_response(ex.code, exclude=("message",)), ex.code),
     )
