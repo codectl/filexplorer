@@ -60,6 +60,7 @@ def setup_app(app):
         responses=[
             oas.HttpResponse(code=400, reason=HTTP_STATUS_CODES[400]),
             oas.HttpResponse(code=401, reason=HTTP_STATUS_CODES[401]),
+            oas.HttpResponse(code=403, reason=HTTP_STATUS_CODES[403]),
             oas.HttpResponse(code=404, reason=HTTP_STATUS_CODES[404]),
         ],
     )
