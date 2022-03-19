@@ -45,9 +45,9 @@ class FilesystemAPI:
 
     @staticmethod
     def raise_error(error) -> typing.Type[CommandError]:
-        if "No such file or directory" == error:
+        if error == "No such file or directory":
             return FileNotFoundException
-        elif "Permission denied" == error:
+        elif error == "Permission denied":
             return PermissionDeniedException
         else:
             return DefaultException
