@@ -2,12 +2,13 @@ from apispec import APISpec
 from apispec.ext.marshmallow import MarshmallowPlugin
 from apispec_plugins.webframeworks.flask import FlaskPlugin
 from apispec_ui.flask import Swagger
-from flask import Blueprint, Flask, jsonify, redirect, url_for
+from flask import Blueprint, Flask, redirect, url_for
 from werkzeug.exceptions import HTTPException
 from werkzeug.http import HTTP_STATUS_CODES
 
 from src import __meta__, __version__
 from src.resources.filesystem import blueprint as filesystem
+from src.schemas.serlializers.http import HttpResponseSchema
 from src.settings import oas
 from src.settings.env import config_class, load_dotenv
 
@@ -82,10 +83,13 @@ def setup_app(app):
     app.add_url_rule("/", "index", view_func=lambda: redirect(url_for("swagger.ui")))
 
     # jsonify http errors
+    schema = HttpResponseSchema(only=("code", "reason"))
     app.register_error_handler(
         HTTPException,
         lambda ex: (
-            jsonify(oas.HttpResponse(code=ex.code, reason=HTTP_STATUS_CODES[ex.code])),
+            schema.dump(
+                oas.HttpResponse(code=ex.code, reason=HTTP_STATUS_CODES[ex.code])
+            ),
             ex.code,
         ),
     )
