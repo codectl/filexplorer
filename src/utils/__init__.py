@@ -1,3 +1,4 @@
+from flask_restful import abort
 from werkzeug.http import HTTP_STATUS_CODES
 
 from src.schemas.serlializers.http import HttpResponseSchema
@@ -16,3 +17,7 @@ def http_response(code: int, message="", serialize=True, **kwargs):
     if serialize:
         return HttpResponseSchema(**kwargs).dump(response)
     return response
+
+
+def abort_with(code: int, message=""):
+    abort(code, **http_response(400, message=message))
