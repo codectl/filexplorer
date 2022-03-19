@@ -1,7 +1,7 @@
 from flask import Blueprint, jsonify
 from flask_restful import abort, Api, Resource
-from werkzeug.http import HTTP_STATUS_CODES
 
+from src import utils
 from src.api.filesystem import (
     DefaultException,
     FileNotFoundException,
@@ -53,18 +53,16 @@ class Filesystem(Resource):
         username = current_username
         fs_api = FilesystemAPI(username=username)
         if not any(path.startswith(p) for p in fs_api.supported_paths()):
-            abort(
-                400, code=400, reason=HTTP_STATUS_CODES[400], message="unsupported path"
-            )
+            abort(400, **utils.http_response(400, message="unsupported path"))
         result = []
         try:
             result = fs_api.ls(path=path)
         except PermissionDeniedException:
-            abort(403, code=403, reason=HTTP_STATUS_CODES[403], message="")
+            abort(403, **utils.http_response(403))
         except FileNotFoundException:
-            abort(404, code=404, reason=HTTP_STATUS_CODES[404], message="")
+            abort(404, **utils.http_response(404))
         except DefaultException as ex:
-            abort(400, code=400, reason=HTTP_STATUS_CODES[400], message=str(ex))
+            abort(400, **utils.http_response(400, message=str(ex)))
         return jsonify(result)
 
 
