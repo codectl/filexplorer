@@ -20,4 +20,4 @@ def http_response(code: int, message="", serialize=True, **kwargs):
 
 
 def abort_with(code: int, message=""):
-    abort(code, **http_response(400, message=message))
+    abort(code, **http_response(code, message=message))
