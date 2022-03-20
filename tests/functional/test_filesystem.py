@@ -1,10 +1,8 @@
 from base64 import b64encode
 
 import pytest
-from shell import Shell
 
 from src.api.auth import AuthAPI
-from tests.utils import MockShell
 
 
 @pytest.fixture()
@@ -26,12 +24,33 @@ class TestFilesystem:
         response = client.get("/filesystem/unsupported/", headers=auth)
         assert response.status_code == 400
 
-    def test_valid_path_returns_200(self, client, auth, mocker):
-        mocker.patch.object(Shell, "run", return_value=MockShell(code=0))
+    @pytest.mark.parametrize(
+        "mock_shell",
+        [(0, ["file"], "")],
+        indirect=True,
+    )
+    def test_valid_path_returns_200(self, client, auth, mock_shell):
         response = client.get("/filesystem/tmp/", headers=auth)
         assert response.status_code == 200
+        assert response.json == ["file"]
 
-    def test_invalid_path_returns_404(self, client, auth, mocker):
-        mocker.patch.object(Shell, "run", return_value=MockShell(code=1))
+    @pytest.mark.parametrize(
+        "mock_shell",
+        [(1, [], "ls: root: Permission denied")],
+        indirect=True,
+    )
+    def test_permission_denied_returns_403(self, client, auth, mock_shell):
+        response = client.get("/filesystem/tmp/root/", headers=auth)
+        assert response.status_code == 403
+        assert response.json == {"code": 403, "message": "", "reason": "Forbidden"}
+
+    @pytest.mark.parametrize(
+        "mock_shell",
+        [(1, [], "ls: /tmp/invalid/: No such file or directory")],
+        indirect=True,
+    )
+    def test_missing_resource_returns_404(self, client, auth, mock_shell):
         response = client.get("/filesystem/tmp/invalid/", headers=auth)
         assert response.status_code == 404
+        assert response.json == {"code": 404, "message": "", "reason": "Not Found"}
+
