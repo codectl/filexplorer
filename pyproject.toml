@@ -3,7 +3,7 @@ name = "filexplorer"
 version = "0.1.0"
 description = "A RESTful API for CRUD operations over files in current filesystem."
 authors = ["Renato Damas <rena2damas@gmail.com>"]
-license = "MIT"
+license = "LICENSE"
 readme = "README.rst"
 packages = [
     { include = "*", from = "src" }
