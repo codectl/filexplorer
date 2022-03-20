@@ -53,4 +53,3 @@ class TestFilesystem:
         response = client.get("/filesystem/tmp/invalid/", headers=auth)
         assert response.status_code == 404
         assert response.json == {"code": 404, "message": "", "reason": "Not Found"}
-
