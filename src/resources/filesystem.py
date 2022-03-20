@@ -35,11 +35,12 @@ class Filesystem(Resource):
         responses:
             200:
                 description: Ok
-                application/json:
-                    schema:
-                        type: array
-                        items:
-                            type: string
+                content:
+                    application/json:
+                        schema:
+                            type: array
+                            items:
+                                type: string
             400:
                 $ref: "#/components/responses/BadRequest"
             401:
