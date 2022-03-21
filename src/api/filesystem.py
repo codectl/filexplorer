@@ -14,23 +14,13 @@ __all__ = (
 )
 
 
-class DefaultException(CommandError):
-    pass
-
-
-class FileNotFoundException(CommandError):
-    pass
-
-
-class PermissionDeniedException(CommandError):
-    pass
-
-
 class FilesystemAPI:
     def __init__(self, username=None):
         self.username = username
 
     def ls(self, path):
+        path = utils.validate_path(path, mode="r")
+        print(path)
         command = f"ls {path}"
         return self._run(command)
 
@@ -40,24 +30,12 @@ class FilesystemAPI:
     def _run(self, command):
         process = shell(self.sudo(command))
         if process.code > 0:
-            error = utils.clean_sh_error(process.errors(raw=True))
-            raise self.raise_error(error)(error)
+            raise CommandError(process.errors(raw=True))
         return process.output()
 
     @staticmethod
-    def raise_error(error) -> typing.Type[CommandError]:
-        if error == "No such file or directory":
-            return FileNotFoundException
-        elif error == "Permission denied":
-            return PermissionDeniedException
-        else:
-            return DefaultException
-
-    @staticmethod
     def file_from_path(path):
-        if not os.path.exists(path):
-            return FileNotFoundException()
-        elif os.path.isfile(path):
+        if os.path.isfile(path):
             return os.path.basename(path), path
         elif os.path.isdir(path):
             path = os.path.normpath(path)
