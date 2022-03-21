@@ -1,3 +1,7 @@
+import io
+import os
+import tarfile
+
 from flask_restful import abort
 from werkzeug.http import HTTP_STATUS_CODES
 
@@ -21,3 +25,14 @@ def http_response(code: int, message="", serialize=True, **kwargs):
 
 def abort_with(code: int, message=""):
     abort(code, **http_response(code, message=message))
+
+
+def tar_buffer_stream(path):
+    """Get a compressed tar.gz byte stream of a given path."""
+    path = os.path.normpath(path)
+    basename = os.path.basename(path)
+    file_io = io.BytesIO()
+    with tarfile.open(fileobj=file_io, mode="w|gz") as tar:
+        tar.add(path, arcname=basename)
+    file_io.seek(0)
+    return file_io
