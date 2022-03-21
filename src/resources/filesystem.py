@@ -1,4 +1,4 @@
-from flask import Blueprint, jsonify
+from flask import Blueprint, jsonify, request, send_file
 from flask_restful import Api, Resource
 
 from src import utils
@@ -41,6 +41,10 @@ class Filesystem(Resource):
                             type: array
                             items:
                                 type: string
+                    application/octet-stream:
+                        schema:
+                            type: string
+                            format: binary
             400:
                 $ref: "#/components/responses/BadRequest"
             401:
@@ -64,7 +68,15 @@ class Filesystem(Resource):
             utils.abort_with(code=404)
         except DefaultException as ex:
             utils.abort_with(code=400, message=str(ex))
-        return jsonify(result)
+
+        accept = request.headers["Accept"]
+        if accept == "application/json":
+            return jsonify(result)
+        elif accept == "application/octet-stream":
+            name, buffer = fs_api.file_from_path(path)
+            return send_file(buffer, attachment_filename=name, as_attachment=True)
+        else:
+            utils.abort_with(code=400, message="Unsupported 'Accept' HTTP header")
 
 
 @api.resource("/supported-paths", endpoint="supported-paths")
