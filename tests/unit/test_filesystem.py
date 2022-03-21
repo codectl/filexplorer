@@ -1,12 +1,8 @@
 import pytest
 from flask import Flask
+from shell import CommandError
 
-from src.api.filesystem import (
-    DefaultException,
-    FileNotFoundException,
-    PermissionDeniedException,
-    FilesystemAPI,
-)
+from src.api.filesystem import FilesystemAPI
 
 
 @pytest.fixture(scope="class")
@@ -26,32 +22,31 @@ class TestFilesystemAPI:
         [(0, ["file"], "")],
         indirect=True,
     )
-    def test_valid_ls_returns_valid_data(self, api, mocker_shell):
+    def test_valid_ls_returns_valid_data(self, api, mocker_shell, mocker):
+        mocker.patch("src.utils.validate_path", return_value=True)
         assert api.ls(path="/valid-path") == ["file"]
 
-    @pytest.mark.parametrize(
-        "mocker_shell",
-        [(1, [], "ls: root: Permission denied")],
-        indirect=True,
-    )
-    def test_ls_on_restricted_file_raises_exception(self, api, mocker_shell):
-        with pytest.raises(PermissionDeniedException):
+    def test_ls_on_restricted_path_raises_exception(self, api, mocker):
+        mocker.patch("src.utils.validate_path", side_effect=PermissionError)
+        with pytest.raises(PermissionError):
             assert api.ls(path="/restricted-path")
 
-    @pytest.mark.parametrize(
-        "mocker_shell",
-        [(1, [], "ls: /tmp/missing-file: No such file or directory")],
-        indirect=True,
-    )
-    def test_ls_on_missing_file_raises_exception(self, api, mocker_shell):
-        with pytest.raises(FileNotFoundException):
+    def test_ls_on_missing_file_raises_exception(self, api, mocker):
+        mocker.patch("src.utils.validate_path", side_effect=FileNotFoundError)
+        with pytest.raises(FileNotFoundError):
             assert api.ls(path="/missing-file")
+
+    def test_ls_os_error_raises_exception(self, api, mocker):
+        mocker.patch("src.utils.validate_path", side_effect=OSError)
+        with pytest.raises(OSError):
+            assert api.ls(path="/???")
 
     @pytest.mark.parametrize(
         "mocker_shell",
-        [(1, [], "ls: ???")],
+        [(1, "", "???")],
         indirect=True,
     )
-    def test_ls_generic_error_raises_exception(self, api, mocker_shell):
-        with pytest.raises(DefaultException):
+    def test_command_error_raises_exception(self, api, mocker_shell, mocker):
+        mocker.patch("src.utils.validate_path", return_value=True)
+        with pytest.raises(CommandError):
             assert api.ls(path="/???")
