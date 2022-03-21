@@ -24,17 +24,17 @@ def validate_path(path, mode="r"):
     return path
 
 
-def http_response(code: int, message="", serialize=True, **kwargs):
-    response = oas.HttpResponse(
-        code=code, reason=HTTP_STATUS_CODES[code], message=message
-    )
-    if serialize:
-        return HttpResponseSchema(**kwargs).dump(response)
-    return response
-
-
-def abort_with(code: int, message=""):
-    abort(code, **http_response(code, message=message))
+def attachment(path):
+    """Get file attachment from given path.
+    If path is a file, return file.
+    If path is a directory, return compressed dir.
+    """
+    if os.path.isfile(path):
+        return os.path.basename(path), path
+    elif os.path.isdir(path):
+        path = os.path.normpath(path)
+        name = f"{os.path.basename(path)}.tar.gz"
+        return name, tar_buffer_stream(path)
 
 
 def tar_buffer_stream(path):
@@ -46,3 +46,16 @@ def tar_buffer_stream(path):
         tar.add(path, arcname=basename)
     file_io.seek(0)
     return file_io
+
+
+def http_response(code: int, message="", serialize=True, **kwargs):
+    response = oas.HttpResponse(
+        code=code, reason=HTTP_STATUS_CODES[code], message=message
+    )
+    if serialize:
+        return HttpResponseSchema(**kwargs).dump(response)
+    return response
+
+
+def abort_with(code: int, message=""):
+    abort(code, **http_response(code, message=message))
