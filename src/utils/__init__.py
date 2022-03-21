@@ -9,9 +9,19 @@ from src.schemas.serlializers.http import HttpResponseSchema
 from src.settings import oas
 
 
-def clean_sh_error(error):
-    """Get a clean error returned by a shell command."""
-    return error.split(":")[-1].strip()
+def validate_path(path, mode="r"):
+    """Path validation.
+    :raises:
+        FileNotFoundError: if file is not found
+        PermissionError: if missing permissions
+        OSError: base exception
+    """
+    path = os.path.normpath(path)
+    try:
+        open(path, mode=mode)
+    except IsADirectoryError:
+        pass
+    return path
 
 
 def http_response(code: int, message="", serialize=True, **kwargs):
