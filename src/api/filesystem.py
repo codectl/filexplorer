@@ -1,6 +1,3 @@
-import os
-import typing
-
 from flask import current_app
 from shell import CommandError, shell
 
