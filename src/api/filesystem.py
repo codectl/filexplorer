@@ -6,12 +6,7 @@ from shell import CommandError, shell
 
 from src import utils
 
-__all__ = (
-    "DefaultException",
-    "FileNotFoundException",
-    "PermissionDeniedException",
-    "FilesystemAPI",
-)
+__all__ = ("FilesystemAPI",)
 
 
 class FilesystemAPI:
@@ -20,7 +15,6 @@ class FilesystemAPI:
 
     def ls(self, path):
         path = utils.validate_path(path, mode="r")
-        print(path)
         command = f"ls {path}"
         return self._run(command)
 
@@ -32,15 +26,6 @@ class FilesystemAPI:
         if process.code > 0:
             raise CommandError(process.errors(raw=True))
         return process.output()
-
-    @staticmethod
-    def file_from_path(path):
-        if os.path.isfile(path):
-            return os.path.basename(path), path
-        elif os.path.isdir(path):
-            path = os.path.normpath(path)
-            name = f"{os.path.basename(path)}.tar.gz"
-            return name, utils.tar_buffer_stream(path)
 
     @staticmethod
     def supported_paths():
