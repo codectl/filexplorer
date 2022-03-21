@@ -1,3 +1,4 @@
+import contextlib
 import io
 import os
 import tarfile
@@ -17,9 +18,7 @@ def validate_path(path, mode="r"):
         OSError: base exception
     """
     path = os.path.normpath(path)
-    try:
-        open(path, mode=mode)
-    except IsADirectoryError:
+    with contextlib.suppress(IsADirectoryError), open(path, mode=mode):
         pass
     return path
 
