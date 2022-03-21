@@ -1,3 +1,4 @@
+import os
 import typing
 
 from flask import current_app
@@ -51,6 +52,17 @@ class FilesystemAPI:
             return PermissionDeniedException
         else:
             return DefaultException
+
+    @staticmethod
+    def file_from_path(path):
+        if not os.path.exists(path):
+            return FileNotFoundException()
+        elif os.path.isfile(path):
+            return os.path.basename(path), path
+        elif os.path.isdir(path):
+            path = os.path.normpath(path)
+            name = f"{os.path.basename(path)}.tar.gz"
+            return name, utils.tar_buffer_stream(path)
 
     @staticmethod
     def supported_paths():
