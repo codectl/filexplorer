@@ -71,5 +71,8 @@ class TestFilesystem:
             app.config["SUPPORTED_PATHS"] = [base_path]
             response = client.get(f"/filesystem{tmp.name}", headers=headers)
             assert response.status_code == 200
-            assert response.headers["Content-Disposition"] == f"attachment; filename={filename}"
+            assert (
+                response.headers["Content-Disposition"]
+                == f"attachment; filename={filename}"
+            )
             assert response.headers["Content-Type"] == "application/octet-stream"
