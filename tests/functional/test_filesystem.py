@@ -91,6 +91,6 @@ class TestFilesystem:
         assert response.status_code == 400
         assert response.json == {
             "code": 400,
-            "message": "Unsupported 'accept' HTTP " "header",
+            "message": "unsupported 'accept' HTTP header",
             "reason": "Bad Request",
         }
