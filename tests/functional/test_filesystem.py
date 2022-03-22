@@ -68,7 +68,7 @@ class TestFilesystem:
             filename = os.path.basename(tmp.name)
             mocker.patch("src.utils.attachment", return_value=(filename, tmp.name))
             base_path = re.match(rf"{os.path.sep}\w*", tmp.name).group()
-            app.config["SUPPORTED_PATHS"] = [base_path]
+            mocker.patch.dict(app.config, {"SUPPORTED_PATHS": [base_path]})
             response = client.get(f"/filesystem{tmp.name}", headers=headers)
             assert response.status_code == 200
             assert (
@@ -76,3 +76,21 @@ class TestFilesystem:
                 == f"attachment; filename={filename}"
             )
             assert response.headers["Content-Type"] == "application/octet-stream"
+
+    @pytest.mark.parametrize(
+        "mocker_shell",
+        [(0, ["foo.txt"], "")],
+        indirect=True,
+    )
+    def test_unsupported_accept_header_path_returns_400(
+        self, client, auth, mocker_shell, mocker
+    ):
+        mocker.patch("src.utils.validate_path", return_value=True)
+        headers = {**auth, "accept": "text/html"}
+        response = client.get("/filesystem/tmp/", headers=headers)
+        assert response.status_code == 400
+        assert response.json == {
+            "code": 400,
+            "message": "Unsupported 'accept' HTTP " "header",
+            "reason": "Bad Request",
+        }
