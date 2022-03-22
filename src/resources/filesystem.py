@@ -1,5 +1,6 @@
 from flask import Blueprint, jsonify, request, send_file
 from flask_restful import Api, Resource
+from http.client import HTTPException
 
 from src import utils
 from src.api.filesystem import FilesystemAPI
@@ -54,24 +55,25 @@ class Filesystem(Resource):
         fs_api = FilesystemAPI(username=username)
         if not any(path.startswith(p) for p in fs_api.supported_paths()):
             utils.abort_with(code=400, message="unsupported path")
-        result = []
         try:
             result = fs_api.ls(path=path)
+
+            accept = request.headers.get("accept", "application/json")
+            if accept == "application/json":
+                return jsonify(result)
+            elif accept == "application/octet-stream":
+                name, attachment = utils.attachment(path)
+                return send_file(
+                    attachment, attachment_filename=name, as_attachment=True
+                )
+            raise HTTPException("Unsupported 'accept' HTTP header")
+
         except PermissionError:
             utils.abort_with(code=403)
         except FileNotFoundError:
             utils.abort_with(code=404)
         except Exception as ex:
             utils.abort_with(code=400, message=str(ex))
-
-        accept = request.headers.get("accept", "application/json")
-        if accept == "application/json":
-            return jsonify(result)
-        elif accept == "application/octet-stream":
-            name, attachment = utils.attachment(path)
-            return send_file(attachment, attachment_filename=name, as_attachment=True)
-        else:
-            utils.abort_with(code=400, message="Unsupported 'accept' HTTP header")
 
 
 @api.resource("/supported-paths", endpoint="supported-paths")
