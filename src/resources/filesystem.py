@@ -50,7 +50,7 @@ class Filesystem(Resource):
             404:
                 $ref: "#/components/responses/NotFound"
         """
-        path = f"/{path}"
+        path = utils.normpath(path)
         username = current_username
         fs_api = FilesystemAPI(username=username)
         if not any(path.startswith(p) for p in fs_api.supported_paths()):
