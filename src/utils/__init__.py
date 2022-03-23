@@ -1,6 +1,6 @@
-import contextlib
 import io
 import os
+import subprocess
 import tarfile
 
 from flask_restful import abort
@@ -12,19 +12,6 @@ from src.settings import oas
 
 def normpath(path):
     return os.path.normpath(f"/{path.strip('/')}")
-
-
-def validate_path(path, mode="r"):
-    """Path validation.
-    :raises:
-        FileNotFoundError: if file is not found
-        PermissionError: if missing permissions
-        OSError: base exception
-    """
-    path = normpath(path)
-    with contextlib.suppress(IsADirectoryError), open(path, mode=mode):
-        pass
-    return path
 
 
 def attachment(path):
@@ -62,3 +49,23 @@ def http_response(code: int, message="", serialize=True, **kwargs):
 
 def abort_with(code: int, message=""):
     abort(code, **http_response(code, message=message))
+
+
+def shell(cmd, **kwargs):
+    popen = subprocess.Popen(
+        cmd.split(),
+        stdin=kwargs.pop("stdin", subprocess.PIPE),
+        stdout=kwargs.pop("stdout", subprocess.PIPE),
+        stderr=kwargs.pop("stderr", subprocess.PIPE),
+        universal_newlines=True,
+        **kwargs
+    )
+
+    stdout, stderr = popen.communicate()
+    if popen.returncode > 0:
+        raise subprocess.CalledProcessError(
+            returncode=popen.returncode,
+            cmd=cmd,
+            stderr=stderr
+        )
+    return stdout
