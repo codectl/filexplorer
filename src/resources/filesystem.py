@@ -66,12 +66,76 @@ class Filesystem(Resource):
                 return send_file(
                     attachment, attachment_filename=name, as_attachment=True
                 )
-            raise HTTPException("Unsupported 'accept' HTTP header")
+            raise HTTPException("unsupported 'accept' HTTP header")
 
-        except PermissionError:
-            utils.abort_with(code=403)
-        except FileNotFoundError:
-            utils.abort_with(code=404)
+        except PermissionError as ex:
+            utils.abort_with(code=403, message=str(ex))
+        except FileNotFoundError as ex:
+            utils.abort_with(code=404, message=str(ex))
+        except Exception as ex:
+            utils.abort_with(code=400, message=str(ex))
+
+    @requires_auth(schemes=["basic"])
+    def post(self, path):
+        """
+        List content in given path.
+        ---
+        parameters:
+        - in: path
+          name: path
+          schema:
+            type: string
+          required: true
+          description: the path to create the resource at
+        tags:
+            - filesystem
+        security:
+            - BasicAuth: []
+        requestBody:
+            content:
+                multipart/form-data:
+                    schema:
+                        type: object
+                        required: [files]
+                        properties:
+                            files:
+                                type: array
+                                items:
+                                    type: file
+                                    description: file to create
+        responses:
+            201:
+                content:
+                    application/json:
+                        schema:
+                            "$ref": "#/components/schemas/HttpResponse"
+
+            400:
+                $ref: "#/components/responses/BadRequest"
+            401:
+                $ref: "#/components/responses/Unauthorized"
+            403:
+                $ref: "#/components/responses/Forbidden"
+            404:
+                $ref: "#/components/responses/NotFound"
+        """
+        path = utils.normpath(path)
+        username = current_username
+        fs_api = FilesystemAPI(username=username)
+        if not any(path.startswith(p) for p in fs_api.supported_paths()):
+            utils.abort_with(code=400, message="unsupported path")
+
+        files = request.files.to_dict(flat=False).get("files", [])
+        if not files:
+            utils.abort_with(code=400, message="missing files")
+
+        try:
+            fs_api.create(path=path, files=files)
+            return utils.http_response(201)
+        except PermissionError as ex:
+            utils.abort_with(code=403, message=str(ex))
+        except FileNotFoundError as ex:
+            utils.abort_with(code=404, message=str(ex))
         except Exception as ex:
             utils.abort_with(code=400, message=str(ex))
 
