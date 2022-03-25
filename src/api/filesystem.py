@@ -1,7 +1,6 @@
 import io
 import os
 import subprocess
-import typing
 
 from flask import current_app
 from werkzeug.utils import secure_filename
