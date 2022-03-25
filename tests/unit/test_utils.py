@@ -1,9 +1,11 @@
+import subprocess
 from dataclasses import asdict
 
 import pytest
 
 from src.utils import (
     normpath,
+    shell,
     file_type,
     isfile,
     isdir,
@@ -21,14 +23,28 @@ def test_normpath():
     assert normpath("//tmp//") == "/tmp"
 
 
+def test_shell(mocker):
+    mock = mocker.patch("subprocess.Popen").return_value
+    mock.configure_mock(
+        **{"communicate.return_value": ("file.txt", ""), "returncode": 0}
+    )
+    assert shell("ls") == "file.txt"
+
+    mock.configure_mock(**{"communicate.return_value": ("", "error"), "returncode": 1})
+    with pytest.raises(subprocess.CalledProcessError) as ex:
+        shell("ls")
+    assert ex.value.returncode == 1
+    assert ex.value.stderr == "error"
+
+
 def test_file_type():
     assert file_type(None) is None
     assert file_type("") is None
-    assert file_type("-") is "-"
-    assert file_type("-rwx") is "-"
-    assert file_type("-rwxr--r--") is "-"
-    assert file_type("drwxr--r--") is "d"
-    assert file_type("prwxr--r-- etc") is "p"
+    assert file_type("-") == "-"
+    assert file_type("-rwx") == "-"
+    assert file_type("-rwxr--r--") == "-"
+    assert file_type("drwxr--r--") == "d"
+    assert file_type("prwxr--r-- etc") == "p"
 
 
 def test_isfile():
