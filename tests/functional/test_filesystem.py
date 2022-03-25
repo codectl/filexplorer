@@ -51,10 +51,10 @@ class TestFilesystem:
         }
 
     def test_missing_path_returns_404(self, client, auth, mocker):
-        stderr = "ls: /tmp/invalid/: No such file or directory"
+        stderr = "ls: /tmp/missing/: No such file or directory"
         err = subprocess.CalledProcessError(cmd="", returncode=1, stderr=stderr)
         mocker.patch("src.utils.shell", side_effect=err)
-        response = client.get("/filesystem/tmp/invalid/", headers=auth)
+        response = client.get("/filesystem/tmp/missing/", headers=auth)
         assert response.status_code == 404
         assert response.json == {
             "code": 404,
