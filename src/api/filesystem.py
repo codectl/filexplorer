@@ -36,7 +36,7 @@ class FilesystemAPI:
             content = io.BytesIO(stream)
             return filename, content
 
-        raise ValueError("unsupported file type")
+        raise ValueError("unsupported file mode")
 
     def upload_files(self, path, files=()):
         """Upload given files to the specified path ensuring
