@@ -23,15 +23,22 @@ class FilesystemAPI:
         return compressed format, otherwise file path is returned.
         """
         stat = self.ls(path=path, flags="-dlL")[0]
-        if utils.isfile(stat=stat):
-            return os.path.basename(path), path
+        if not utils.isfile(stat=stat) and not utils.isdir(stat=stat):
+            raise ValueError("unsupported file type")
+        elif utils.isfile(stat=stat):
+            cmd = f"cat {path}"
+            stream = self._run(cmd=cmd, user=self.username, universal_newlines=False)
+            filename = os.path.basename(path)
+            content = io.BytesIO(stream)
+            return filename, content
         elif utils.isdir(stat=stat):
             archive_dir = os.path.dirname(path)
             archive_name = os.path.basename(path)
             cmd = f"tar -cvpf - -C {archive_dir} {archive_name}"
             stream = self._run(cmd=cmd, user=self.username, universal_newlines=False)
-            return f"{os.path.basename(path)}.tar.gz", io.BytesIO(stream)
-        raise ValueError("unsupported file type")
+            filename = f"{os.path.basename(path)}.tar.gz"
+            content = io.BytesIO(stream)
+            return filename, content
 
     def upload_files(self, path, files=()):
         """Upload given files to the specified path ensuring
