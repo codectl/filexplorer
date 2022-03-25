@@ -1,3 +1,5 @@
+import io
+import stat
 import subprocess
 
 import pytest
@@ -45,3 +47,15 @@ class TestFilesystemAPI:
         with pytest.raises(Exception) as ex:
             assert api.ls(path="/???")
         assert str(ex.value) == stderr
+
+    def test_valid_file_attachment(self, api, mocker):
+        mocker.patch("src.utils.shell", return_value=b"content")
+        name, content = api.attachment(path="/file.txt", mode=stat.S_IFREG)
+        assert name == "file.txt"
+        assert content.read() == io.BytesIO(b"content").read()
+
+    def test_valid_directory_attachment(self, api, mocker):
+        mocker.patch("src.utils.shell", return_value=b"content")
+        name, content = api.attachment(path="/dir/", mode=stat.S_IFDIR)
+        assert name == "dir.tar.gz"
+        assert content.read() == io.BytesIO(b"content").read()
