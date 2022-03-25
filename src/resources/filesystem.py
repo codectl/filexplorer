@@ -62,7 +62,7 @@ class Filesystem(Resource):
             if accept == "application/json":
                 return jsonify(result)
             elif accept == "application/octet-stream":
-                name, attachment = utils.attachment(path)
+                name, attachment = fs_api.download(path)
                 return send_file(
                     attachment, attachment_filename=name, as_attachment=True
                 )
