@@ -18,11 +18,13 @@ class FilesystemAPI:
         return self._run(cmd=f"ls {flags} {path}", user=self.username)
 
     def download(self, path):
-        stats = self.ls(path=path, flags="-dlL")[0]
-        if utils.isfile(value=stats):
+        stat = self.ls(path=path, flags="-dlL")[0]
+        if utils.isfile(stat=stat):
             return os.path.basename(path), path
-        elif utils.isdir(value=stats):
-            cmd = f"tar -cvpf - -C {os.path.dirname(path)} {os.path.basename(path)}"
+        elif utils.isdir(stat=stat):
+            archive_dir = os.path.dirname(path)
+            archive_name = os.path.basename(path)
+            cmd = f"tar -cvpf - -C {archive_dir} {archive_name}"
             stream = self._run(
                 cmd=cmd,
                 user=self.username,

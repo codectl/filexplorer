@@ -71,16 +71,17 @@ def shell(cmd, universal_newlines=True, **kwargs):
     return stdout
 
 
-def file_type(permission):
-    if not permission or not isinstance(permission, str):
+def isfile(stat):
+    return file_type(stat=stat) == "-"
+
+
+def isdir(stat):
+    return file_type(stat=stat) == "d"
+
+
+def file_type(stat):
+    """Return first character from a stat string like '-rwx'."""
+    if not stat or not isinstance(stat, str):
         return None
-    permissions = next(iter(permission.split()), "")
+    permissions = next(iter(stat.split()), "")
     return next(iter(permissions), None)
-
-
-def isfile(permission):
-    return file_type(permission=permission) == "-"
-
-
-def isdir(permission):
-    return file_type(permission=permission) == "d"
