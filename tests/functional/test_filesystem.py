@@ -66,10 +66,10 @@ class TestFilesystem:
         mocker.patch("src.utils.shell", side_effect=["file.txt", b""])
         mocker.patch("src.utils.isfile", return_value=True)
         headers = {**auth, "accept": "application/octet-stream"}
-        response = client.get(f"/filesystem/tmp/file.txt", headers=headers)
+        response = client.get("/filesystem/tmp/file.txt", headers=headers)
         assert response.status_code == 200
         assert (
-            response.headers["Content-Disposition"] == f"attachment; filename=file.txt"
+            response.headers["Content-Disposition"] == "attachment; filename=file.txt"
         )
         assert response.headers["Content-Type"] == "text/plain; charset=utf-8"
 
@@ -77,11 +77,10 @@ class TestFilesystem:
         mocker.patch("src.utils.shell", side_effect=["dir/", b""])
         mocker.patch("src.utils.isdir", return_value=True)
         headers = {**auth, "accept": "application/octet-stream"}
-        response = client.get(f"/filesystem/tmp/dir/", headers=headers)
+        response = client.get("/filesystem/tmp/dir/", headers=headers)
         assert response.status_code == 200
         assert (
-            response.headers["Content-Disposition"]
-            == f"attachment; filename=dir.tar.gz"
+            response.headers["Content-Disposition"] == "attachment; filename=dir.tar.gz"
         )
         assert response.headers["Content-Type"] == "application/x-tar"
 
