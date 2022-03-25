@@ -1,3 +1,4 @@
+import stat
 import subprocess
 from dataclasses import asdict
 
@@ -6,7 +7,7 @@ import pytest
 from src.utils import (
     normpath,
     shell,
-    file_type,
+    file_mode,
     isfile,
     isdir,
     http_response,
@@ -38,31 +39,36 @@ def test_shell(mocker):
 
 
 def test_file_type():
-    assert file_type(None) is None
-    assert file_type("") is None
-    assert file_type("-") == "-"
-    assert file_type("-rwx") == "-"
-    assert file_type("-rwxr--r--") == "-"
-    assert file_type("drwxr--r--") == "d"
-    assert file_type("prwxr--r-- etc") == "p"
+    assert file_mode(None) is None
+    assert file_mode("") is None
+    assert file_mode("-") == stat.S_IFREG
+    assert file_mode("-rwx") == stat.S_IFREG
+    assert file_mode("-rwxr--r--") == stat.S_IFREG
+    assert file_mode("drwxr--r--") == stat.S_IFDIR
+    assert file_mode("drwxr--r-- ...") == stat.S_IFDIR
+    assert file_mode("prwxr--r--") == 0
 
 
 def test_isfile():
     assert isfile(None) is False
     assert isfile("") is False
-    assert isfile("d") is False
-    assert isfile("p") is False
-    assert isfile("etc") is False
-    assert isfile("-") is True
+    assert isfile(stat.S_IFREG) is True
+    assert isfile(stat.S_IFDIR) is False
+    assert isfile(stat.S_IFCHR) is False
+    with pytest.raises(TypeError):
+        isfile("x")
+        isfile("abc")
 
 
 def test_isdir():
     assert isdir(None) is False
     assert isdir("") is False
-    assert isdir("p") is False
-    assert isdir("etc") is False
-    assert isdir("-") is False
-    assert isdir("d") is True
+    assert isdir(stat.S_IFDIR) is True
+    assert isdir(stat.S_IFREG) is False
+    assert isdir(stat.S_IFCHR) is False
+    with pytest.raises(TypeError):
+        isdir("x")
+        isdir("abc")
 
 
 def test_response():
