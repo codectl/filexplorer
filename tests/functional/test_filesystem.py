@@ -1,8 +1,5 @@
-import os
-import re
 import subprocess
 from base64 import b64encode
-from tempfile import NamedTemporaryFile
 
 import pytest
 
