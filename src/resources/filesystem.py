@@ -56,13 +56,13 @@ class Filesystem(Resource):
         if not any(path.startswith(p) for p in fs_api.supported_paths()):
             utils.abort_with(code=400, message="unsupported path")
         try:
-            result = fs_api.ls(path=path)
-
             accept = request.headers.get("accept", "application/json")
             if accept == "application/json":
-                return jsonify(result)
+                return jsonify(fs_api.ls(path=path))
             elif accept == "application/octet-stream":
-                name, content = fs_api.attachment(path)
+                stats = fs_api.ls(path=path, flags="-dlL")[0]
+                mode = utils.file_mode(stats=stats)
+                name, content = fs_api.attachment(path=path, mode=mode)
                 return send_file(content, attachment_filename=name, as_attachment=True)
             raise HTTPException("unsupported 'accept' HTTP header")
 
