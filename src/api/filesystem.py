@@ -18,20 +18,15 @@ class FilesystemAPI:
     def ls(self, path, flags=""):
         return self._run(cmd=f"ls {flags} {path}", user=self.username)
 
-    def attachment(self, path) -> (str, typing.Union[str, bytes]):
-        """Get attachable file data. If given path is a directory,
-        return compressed format, otherwise file path is returned.
-        """
-        stat = self.ls(path=path, flags="-dlL")[0]
-        if not utils.isfile(stat=stat) and not utils.isdir(stat=stat):
-            raise ValueError("unsupported file type")
-        elif utils.isfile(stat=stat):
+    def attachment(self, path, mode=None) -> (str, bytes):
+        """Get attachable file tuple consisting of name and bytes content."""
+        if utils.isfile(mode):
             cmd = f"cat {path}"
             stream = self._run(cmd=cmd, user=self.username, universal_newlines=False)
             filename = os.path.basename(path)
             content = io.BytesIO(stream)
             return filename, content
-        elif utils.isdir(stat=stat):
+        elif utils.isdir(mode):
             archive_dir = os.path.dirname(path)
             archive_name = os.path.basename(path)
             cmd = f"tar -cvpf - -C {archive_dir} {archive_name}"
@@ -39,6 +34,8 @@ class FilesystemAPI:
             filename = f"{os.path.basename(path)}.tar.gz"
             content = io.BytesIO(stream)
             return filename, content
+
+        raise ValueError("unsupported file type")
 
     def upload_files(self, path, files=()):
         """Upload given files to the specified path ensuring
