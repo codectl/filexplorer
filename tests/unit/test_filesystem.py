@@ -1,6 +1,7 @@
+import subprocess
+
 import pytest
 from flask import Flask
-from shell import CommandError
 
 from src.api.filesystem import FilesystemAPI
 
@@ -17,36 +18,30 @@ class TestFilesystemAPI:
         with app.test_request_context():
             assert api.supported_paths() == ["/test"]
 
-    @pytest.mark.parametrize(
-        "mocker_shell",
-        [(0, ["file"], "")],
-        indirect=True,
-    )
-    def test_valid_ls_returns_valid_data(self, api, mocker_shell, mocker):
-        mocker.patch("src.utils.validate_path", return_value=True)
-        assert api.ls(path="/valid-path") == ["file"]
+    def test_valid_ls_returns_valid_data(self, api, mocker):
+        mocker.patch("src.utils.shell", return_value="file.txt")
+        assert api.ls(path="/valid-path") == ["file.txt"]
 
     def test_ls_on_restricted_path_raises_exception(self, api, mocker):
-        mocker.patch("src.utils.validate_path", side_effect=PermissionError)
-        with pytest.raises(PermissionError):
+        stderr = "ls: /tmp/root/: Permission denied"
+        err = subprocess.CalledProcessError(cmd="", returncode=1, stderr=stderr)
+        mocker.patch("src.utils.shell", side_effect=err)
+        with pytest.raises(PermissionError) as ex:
             assert api.ls(path="/restricted-path")
+        assert str(ex.value) == "permission denied"
 
     def test_ls_on_missing_file_raises_exception(self, api, mocker):
-        mocker.patch("src.utils.validate_path", side_effect=FileNotFoundError)
-        with pytest.raises(FileNotFoundError):
-            assert api.ls(path="/missing-file")
+        stderr = "ls: /tmp/missing/: No such file or directory"
+        err = subprocess.CalledProcessError(cmd="", returncode=1, stderr=stderr)
+        mocker.patch("src.utils.shell", side_effect=err)
+        with pytest.raises(FileNotFoundError) as ex:
+            assert api.ls(path="/missing")
+        assert str(ex.value) == "no such file or directory"
 
-    def test_ls_os_error_raises_exception(self, api, mocker):
-        mocker.patch("src.utils.validate_path", side_effect=OSError)
-        with pytest.raises(OSError):
+    def test_ls_on_error_raises_exception(self, api, mocker):
+        stderr = "there was an error"
+        err = subprocess.CalledProcessError(cmd="", returncode=1, stderr=stderr)
+        mocker.patch("src.utils.shell", side_effect=err)
+        with pytest.raises(Exception) as ex:
             assert api.ls(path="/???")
-
-    @pytest.mark.parametrize(
-        "mocker_shell",
-        [(1, "", "???")],
-        indirect=True,
-    )
-    def test_command_error_raises_exception(self, api, mocker_shell, mocker):
-        mocker.patch("src.utils.validate_path", return_value=True)
-        with pytest.raises(CommandError):
-            assert api.ls(path="/???")
+        assert str(ex.value) == stderr
