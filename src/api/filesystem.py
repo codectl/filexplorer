@@ -20,6 +20,7 @@ class FilesystemAPI:
 
     def attachment(self, path, mode=None) -> (str, bytes):
         """Get attachable file tuple consisting of name and bytes content."""
+        path = utils.normpath(path)
         if utils.isfile(mode):
             cmd = f"cat {path}"
             stream = self._run(cmd=cmd, user=self.username, universal_newlines=False)
