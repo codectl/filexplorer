@@ -1,4 +1,5 @@
 import os
+import stat
 import subprocess
 
 from flask_restful import abort
@@ -30,20 +31,25 @@ def shell(cmd, universal_newlines=True, **kwargs):
     return stdout
 
 
-def isfile(stat):
-    return file_type(stat=stat) == "-"
+def isfile(mode):
+    return stat.S_ISREG(mode)
 
 
-def isdir(stat):
-    return file_type(stat=stat) == "d"
+def isdir(mode):
+    return stat.S_ISDIR(mode)
 
 
-def file_type(stat):
+def file_mode(stats):
     """Return first character from a stat string like '-rwx'."""
-    if not stat or not isinstance(stat, str):
+    if not stats or not isinstance(stats, str):
         return None
-    permissions = next(iter(stat.split()), "")
-    return next(iter(permissions), None)
+    permissions = next(iter(stats.split()), "")
+    char = next(iter(permissions), None)
+    if char == "-":
+        return stat.S_IFREG
+    elif char == "d":
+        return stat.S_IFDIR
+    return 0
 
 
 def http_response(code: int, message="", serialize=True, **kwargs):
