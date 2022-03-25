@@ -4,8 +4,9 @@ import pytest
 
 from src.utils import (
     normpath,
-    validate_path,
-    attachment,
+    file_type,
+    isfile,
+    isdir,
     http_response,
 )
 
@@ -20,31 +21,32 @@ def test_normpath():
     assert normpath("//tmp//") == "/tmp"
 
 
-def test_validate_path(mocker):
-    with pytest.raises(ValueError):
-        validate_path("/tmp", mode="xyz")
-    mock_open = mocker.mock_open
-    mocker.patch("builtins.open", new_callable=mock_open, read_data="data")
-    assert validate_path("/tmp", mode="r") == "/tmp"
-    assert validate_path("/tmp/", mode="r") == "/tmp"
-    assert validate_path("tmp", mode="r") == "/tmp"
-    assert validate_path("/tmp/foot.txt", mode="r") == "/tmp/foot.txt"
-    mocker.patch("builtins.open", side_effect=FileNotFoundError)
-    with pytest.raises(FileNotFoundError):
-        validate_path("/tmp/foo.txt", mode="r")
-    mocker.patch("builtins.open", side_effect=PermissionError)
-    with pytest.raises(PermissionError):
-        validate_path("/tmp/root/", mode="r")
+def test_file_type():
+    assert file_type(None) is None
+    assert file_type("") is None
+    assert file_type("-") is "-"
+    assert file_type("-rwx") is "-"
+    assert file_type("-rwxr--r--") is "-"
+    assert file_type("drwxr--r--") is "d"
+    assert file_type("prwxr--r-- etc") is "p"
 
 
-def test_attachment(mocker):
-    mocker.patch("os.path.isfile", return_value=True)
-    assert attachment("/tmp/foo.txt") == ("foo.txt", "/tmp/foo.txt")
+def test_isfile():
+    assert isfile(None) is False
+    assert isfile("") is False
+    assert isfile("d") is False
+    assert isfile("p") is False
+    assert isfile("etc") is False
+    assert isfile("-") is True
 
-    mocker.patch("os.path.isfile", return_value=False)
-    mocker.patch("os.path.isdir", return_value=True)
-    mocker.patch("src.utils.tar_buffer_stream", return_value=b"")
-    assert attachment("/tmp/foo/") == ("foo.tar.gz", b"")
+
+def test_isdir():
+    assert isdir(None) is False
+    assert isdir("") is False
+    assert isdir("p") is False
+    assert isdir("etc") is False
+    assert isdir("-") is False
+    assert isdir("d") is True
 
 
 def test_response():
