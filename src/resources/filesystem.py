@@ -63,9 +63,7 @@ class Filesystem(Resource):
                 return jsonify(result)
             elif accept == "application/octet-stream":
                 name, content = fs_api.attachment(path)
-                return send_file(
-                    content, attachment_filename=name, as_attachment=True
-                )
+                return send_file(content, attachment_filename=name, as_attachment=True)
             raise HTTPException("unsupported 'accept' HTTP header")
 
         except PermissionError as ex:

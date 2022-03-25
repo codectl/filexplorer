@@ -29,19 +29,14 @@ class FilesystemAPI:
             archive_dir = os.path.dirname(path)
             archive_name = os.path.basename(path)
             cmd = f"tar -cvpf - -C {archive_dir} {archive_name}"
-            stream = self._run(
-                cmd=cmd,
-                user=self.username,
-                universal_newlines=False
-            )
+            stream = self._run(cmd=cmd, user=self.username, universal_newlines=False)
             return f"{os.path.basename(path)}.tar.gz", io.BytesIO(stream)
-        else:
-            raise ValueError("unsupported file type")
+        raise ValueError("unsupported file type")
 
     def upload_files(self, path, files=()):
         path_files = self.ls(path)
         if any(secure_filename(file.filename) in path_files for file in files):
-            raise FileExistsError(f"file already exists in given path")
+            raise FileExistsError("file already exists in given path")
         for file in files:
             filename = secure_filename(file.filename)
             dst = f"{path}/{filename}"
@@ -49,7 +44,7 @@ class FilesystemAPI:
                 cmd=f"tee {dst}",
                 stdin=file,
                 stdout=subprocess.DEVNULL,
-                user=self.username
+                user=self.username,
             )
 
     @classmethod

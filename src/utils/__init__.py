@@ -58,15 +58,13 @@ def shell(cmd, universal_newlines=True, **kwargs):
         stdout=kwargs.pop("stdout", subprocess.PIPE),
         stderr=kwargs.pop("stderr", subprocess.PIPE),
         universal_newlines=universal_newlines,
-        **kwargs
+        **kwargs,
     )
 
     stdout, stderr = popen.communicate()
     if popen.returncode > 0:
         raise subprocess.CalledProcessError(
-            returncode=popen.returncode,
-            cmd=cmd,
-            stderr=str(stderr)
+            returncode=popen.returncode, cmd=cmd, stderr=stderr
         )
     return stdout
 
