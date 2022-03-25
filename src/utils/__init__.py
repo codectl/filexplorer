@@ -51,13 +51,13 @@ def abort_with(code: int, message=""):
     abort(code, **http_response(code, message=message))
 
 
-def shell(cmd, **kwargs):
+def shell(cmd, universal_newlines=True, **kwargs):
     popen = subprocess.Popen(
         cmd.split(),
         stdin=kwargs.pop("stdin", subprocess.PIPE),
         stdout=kwargs.pop("stdout", subprocess.PIPE),
         stderr=kwargs.pop("stderr", subprocess.PIPE),
-        universal_newlines=True,
+        universal_newlines=universal_newlines,
         **kwargs
     )
 
@@ -66,6 +66,21 @@ def shell(cmd, **kwargs):
         raise subprocess.CalledProcessError(
             returncode=popen.returncode,
             cmd=cmd,
-            stderr=stderr
+            stderr=str(stderr)
         )
     return stdout
+
+
+def file_type(permission):
+    if not permission or not isinstance(permission, str):
+        return None
+    permissions = next(iter(permission.split()), "")
+    return next(iter(permissions), None)
+
+
+def isfile(permission):
+    return file_type(permission=permission) == "-"
+
+
+def isdir(permission):
+    return file_type(permission=permission) == "d"
