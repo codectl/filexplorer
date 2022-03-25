@@ -62,9 +62,9 @@ class Filesystem(Resource):
             if accept == "application/json":
                 return jsonify(result)
             elif accept == "application/octet-stream":
-                name, attachment = fs_api.download(path)
+                name, content = fs_api.attachment(path)
                 return send_file(
-                    attachment, attachment_filename=name, as_attachment=True
+                    content, attachment_filename=name, as_attachment=True
                 )
             raise HTTPException("unsupported 'accept' HTTP header")
 
@@ -130,7 +130,7 @@ class Filesystem(Resource):
             utils.abort_with(code=400, message="missing files")
 
         try:
-            fs_api.create(path=path, files=files)
+            fs_api.upload_files(path=path, files=files)
             return utils.http_response(201)
         except PermissionError as ex:
             utils.abort_with(code=403, message=str(ex))

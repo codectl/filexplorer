@@ -1,6 +1,7 @@
 import io
 import os
 import subprocess
+import typing
 
 from flask import current_app
 from werkzeug.utils import secure_filename
@@ -17,7 +18,10 @@ class FilesystemAPI:
     def ls(self, path, flags=""):
         return self._run(cmd=f"ls {flags} {path}", user=self.username)
 
-    def download(self, path):
+    def attachment(self, path) -> (str, typing.Union[str, bytes]):
+        """Get attachable file data. If given path is a directory,
+        return compressed format, otherwise file path is returned.
+        """
         stat = self.ls(path=path, flags="-dlL")[0]
         if utils.isfile(stat=stat):
             return os.path.basename(path), path
@@ -31,8 +35,10 @@ class FilesystemAPI:
                 universal_newlines=False
             )
             return f"{os.path.basename(path)}.tar.gz", io.BytesIO(stream)
+        else:
+            raise ValueError("unsupported file type")
 
-    def create(self, path, files=()):
+    def upload_files(self, path, files=()):
         path_files = self.ls(path)
         if any(secure_filename(file.filename) in path_files for file in files):
             raise FileExistsError(f"file already exists in given path")
