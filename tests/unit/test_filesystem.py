@@ -108,6 +108,7 @@ class TestFilesystemAPI:
     def test_valid_upload(self, api, mocker):
         mocker.patch("src.utils.shell", return_value="")
         file = mocker.MagicMock(filename="file.txt")
+        api.upload_files(path="/tmp/dir/", files=[])
         api.upload_files(path="/tmp/dir/", files=[file])
 
     def test_existing_file_upload(self, api, mocker):
