@@ -34,6 +34,9 @@ class FilesystemAPI:
         raise ValueError("unsupported file type")
 
     def upload_files(self, path, files=()):
+        """Upload given files to the specified path ensuring
+        files do not already exist.
+        """
         path_files = self.ls(path)
         if any(secure_filename(file.filename) in path_files for file in files):
             raise FileExistsError("file already exists in given path")
