@@ -32,11 +32,11 @@ def shell(cmd, universal_newlines=True, **kwargs):
 
 
 def isfile(mode):
-    return stat.S_ISREG(mode)
+    return stat.S_ISREG(mode or 0)
 
 
 def isdir(mode):
-    return stat.S_ISDIR(mode)
+    return stat.S_ISDIR(mode or 0)
 
 
 def file_mode(stats):
