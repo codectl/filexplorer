@@ -76,7 +76,7 @@ class Filesystem(Resource):
     @requires_auth(schemes=["basic"])
     def post(self, path):
         """
-        List content in given path.
+        Create files in given path.
         ---
         parameters:
         - in: path
