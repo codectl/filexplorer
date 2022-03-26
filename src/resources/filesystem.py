@@ -193,7 +193,7 @@ class Filesystem(Resource):
 
         try:
             fs_api.upload_files(path=path, files=files, update=True)
-            return utils.http_response(201)
+            return utils.http_response(204)
         except PermissionError as ex:
             utils.abort_with(code=403, message=str(ex))
         except FileNotFoundError as ex:
