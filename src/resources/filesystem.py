@@ -15,7 +15,7 @@ class Filesystem(Resource):
     @requires_auth(schemes=["basic"])
     def get(self, path):
         """
-        List content in given path.
+        List files in given path.
         ---
         parameters:
         - in: path
@@ -129,6 +129,70 @@ class Filesystem(Resource):
 
         try:
             fs_api.upload_files(path=path, files=files)
+            return utils.http_response(201)
+        except PermissionError as ex:
+            utils.abort_with(code=403, message=str(ex))
+        except FileNotFoundError as ex:
+            utils.abort_with(code=404, message=str(ex))
+        except Exception as ex:
+            utils.abort_with(code=400, message=str(ex))
+
+    @requires_auth(schemes=["basic"])
+    def put(self, path):
+        """
+        Update files in given path.
+        ---
+        parameters:
+        - in: path
+          name: path
+          schema:
+            type: string
+          required: true
+          description: the path to update the resource at
+        tags:
+            - filesystem
+        security:
+            - BasicAuth: []
+        requestBody:
+            content:
+                multipart/form-data:
+                    schema:
+                        type: object
+                        required: [files]
+                        properties:
+                            files:
+                                type: array
+                                items:
+                                    type: file
+                                    description: file to update
+        responses:
+            204:
+                content:
+                    application/json:
+                        schema:
+                            "$ref": "#/components/schemas/HttpResponse"
+
+            400:
+                $ref: "#/components/responses/BadRequest"
+            401:
+                $ref: "#/components/responses/Unauthorized"
+            403:
+                $ref: "#/components/responses/Forbidden"
+            404:
+                $ref: "#/components/responses/NotFound"
+        """
+        path = utils.normpath(path)
+        username = current_username
+        fs_api = FilesystemAPI(username=username)
+        if not any(path.startswith(p) for p in fs_api.supported_paths()):
+            utils.abort_with(code=400, message="unsupported path")
+
+        files = request.files.to_dict(flat=False).get("files", [])
+        if not files:
+            utils.abort_with(code=400, message="missing files")
+
+        try:
+            fs_api.upload_files(path=path, files=files, update=True)
             return utils.http_response(201)
         except PermissionError as ex:
             utils.abort_with(code=403, message=str(ex))
