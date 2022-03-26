@@ -106,7 +106,7 @@ class TestFilesystemAPI:
         assert str(ex.value) == "some error occurred"
 
     def test_valid_file_upload(self, api, mocker):
-        mocker.patch("src.utils.shell", return_value="")
+        mocker.patch("src.utils.shell")
         file = mocker.MagicMock(filename="file.txt")
         api.upload_files(path="/tmp/dir/", files=[])
         api.upload_files(path="/tmp/dir/", files=[file])
@@ -124,7 +124,7 @@ class TestFilesystemAPI:
         api.upload_files(path="/tmp/dir/", files=[file], update=True)
 
     def test_missing_file_update_raises_exception(self, api, mocker):
-        mocker.patch("src.utils.shell", return_value="")
+        mocker.patch("src.utils.shell")
         file = mocker.MagicMock(filename="file.txt")
         with pytest.raises(FileNotFoundError):
             api.upload_files(path="/tmp/dir/", files=[file], update=True)
