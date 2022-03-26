@@ -13,7 +13,7 @@ def auth(mocker):
     return {"Authorization": f"Basic {b64encode(b'user:pass').decode()}"}
 
 
-class TestFilesystem:
+class TestFilesystemGET:
     def test_supported_paths(self, client):
         response = client.get("/filesystem/supported-paths")
         assert response.status_code == 200
@@ -95,9 +95,115 @@ class TestFilesystem:
             "reason": "Bad Request",
         }
 
-    def test_create_valid_file_returns_201(self, client, auth, mocker):
+
+class TestFilesystemPOST:
+
+    def test_valid_file_returns_201(self, client, auth, mocker):
         mocker.patch("src.utils.shell")
         response = client.post("/filesystem/tmp/", headers=auth, data={
             "files": (io.BytesIO(b"text"), "file.txt")
         }, content_type="multipart/form-data")
         assert response.status_code == 201
+
+    def test_path_not_a_directory_returns_400(self, client, auth, mocker):
+        stderr = "tee: /tmp/file.txt: Not a directory"
+        err = subprocess.CalledProcessError(cmd="", returncode=1, stderr=stderr)
+        mocker.patch("src.utils.shell", side_effect=err)
+        response = client.post("/filesystem/tmp/file.txt", headers=auth, data={
+            "files": (io.BytesIO(b"text"), "file.txt")
+        }, content_type="multipart/form-data")
+        assert response.status_code == 400
+
+    def test_create_existing_file_returns_400(self, client, auth, mocker):
+        mocker.patch("src.utils.shell", return_value="file.txt")
+        response = client.post("/filesystem/tmp/file.txt", headers=auth, data={
+            "files": (io.BytesIO(b"text"), "file.txt")
+        }, content_type="multipart/form-data")
+        assert response.status_code == 400
+
+    def test_permission_denied_returns_403(self, client, auth, mocker):
+        stderr = "tee: /tmp/root/: Permission denied"
+        err = subprocess.CalledProcessError(cmd="", returncode=1, stderr=stderr)
+        mocker.patch("src.utils.shell", side_effect=err)
+        response = client.post("/filesystem/tmp/root/", headers=auth, data={
+            "files": (io.BytesIO(b"text"), "file.txt")
+        }, content_type="multipart/form-data")
+        assert response.status_code == 403
+        assert response.json == {
+            "code": 403,
+            "message": "permission denied",
+            "reason": "Forbidden",
+        }
+
+    def test_missing_path_returns_404(self, client, auth, mocker):
+        stderr = "tee: /tmp/missing/: No such file or directory"
+        err = subprocess.CalledProcessError(cmd="", returncode=1, stderr=stderr)
+        mocker.patch("src.utils.shell", side_effect=err)
+        response = client.post("/filesystem/tmp/missing/", headers=auth, data={
+            "files": (io.BytesIO(b"text"), "file.txt")
+        }, content_type="multipart/form-data")
+        assert response.status_code == 404
+        assert response.json == {
+            "code": 404,
+            "message": "no such file or directory",
+            "reason": "Not Found",
+        }
+
+
+class TestFilesystemPUT:
+
+    def test_valid_file_returns_204(self, client, auth, mocker):
+        mocker.patch("src.utils.shell", return_value="file.txt")
+        response = client.put("/filesystem/tmp/file.txt", headers=auth, data={
+            "files": (io.BytesIO(b"text"), "file.txt")
+        }, content_type="multipart/form-data")
+        assert response.status_code == 204
+
+    def test_create_file_outside_directory_returns_400(self, client, auth, mocker):
+        stderr = "tee: /tmp/file.txt: Not a directory"
+        err = subprocess.CalledProcessError(cmd="", returncode=1, stderr=stderr)
+        mocker.patch("src.utils.shell", side_effect=err)
+        response = client.put("/filesystem/tmp/file.txt", headers=auth, data={
+            "files": (io.BytesIO(b"text"), "file.txt")
+        }, content_type="multipart/form-data")
+        assert response.status_code == 400
+
+    def test_permission_denied_returns_403(self, client, auth, mocker):
+        stderr = "tee: /tmp/root/: Permission denied"
+        err = subprocess.CalledProcessError(cmd="", returncode=1, stderr=stderr)
+        mocker.patch("src.utils.shell", side_effect=err)
+        response = client.put("/filesystem/tmp/root/", headers=auth, data={
+            "files": (io.BytesIO(b"text"), "file.txt")
+        }, content_type="multipart/form-data")
+        assert response.status_code == 403
+        assert response.json == {
+            "code": 403,
+            "message": "permission denied",
+            "reason": "Forbidden",
+        }
+
+    def test_missing_path_returns_404(self, client, auth, mocker):
+        stderr = "tee: /tmp/missing/: No such file or directory"
+        err = subprocess.CalledProcessError(cmd="", returncode=1, stderr=stderr)
+        mocker.patch("src.utils.shell", side_effect=err)
+        response = client.put("/filesystem/tmp/missing/", headers=auth, data={
+            "files": (io.BytesIO(b"text"), "file.txt")
+        }, content_type="multipart/form-data")
+        assert response.status_code == 404
+        assert response.json == {
+            "code": 404,
+            "message": "no such file or directory",
+            "reason": "Not Found",
+        }
+
+    def test_update_missing_file_returns_404(self, client, auth, mocker):
+        mocker.patch("src.utils.shell", return_value="")
+        response = client.put("/filesystem/tmp/", headers=auth, data={
+            "files": (io.BytesIO(b"text"), "file.txt")
+        }, content_type="multipart/form-data")
+        assert response.status_code == 404
+        assert response.json == {
+            "code": 404,
+            "message": "file does not exist in given path",
+            "reason": "Not Found",
+        }
