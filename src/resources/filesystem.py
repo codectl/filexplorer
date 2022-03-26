@@ -206,7 +206,7 @@ class Filesystem(Resource):
 class SupportedPaths(Resource):
     def get(self):
         """
-        List content in given path.
+        List currently supported filesystem paths.
         ---
         tags:
             - filesystem
