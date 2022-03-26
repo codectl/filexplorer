@@ -41,6 +41,7 @@ class FilesystemAPI:
         """Upload given files to the specified path ensuring
         files do not already exist.
         """
+        path = f"{utils.normpath(path)}/"
         path_files = self.ls(path)
         for file in files:
             filename = secure_filename(file.filename)
