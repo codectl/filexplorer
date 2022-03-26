@@ -37,12 +37,14 @@ class FilesystemAPI:
 
         raise ValueError("unsupported file mode")
 
-    def upload_files(self, path, files=()):
+    def upload_files(self, path, files=(), override=False):
         """Upload given files to the specified path ensuring
         files do not already exist.
         """
         path_files = self.ls(path)
-        if any(secure_filename(file.filename) in path_files for file in files):
+        if not override and any(
+            secure_filename(file.filename) in path_files for file in files
+        ):
             raise FileExistsError("file already exists in given path")
         for file in files:
             filename = secure_filename(file.filename)
