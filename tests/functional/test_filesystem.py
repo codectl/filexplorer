@@ -1,3 +1,4 @@
+import io
 import subprocess
 from base64 import b64encode
 
@@ -93,3 +94,10 @@ class TestFilesystem:
             "message": "unsupported 'accept' HTTP header",
             "reason": "Bad Request",
         }
+
+    def test_create_valid_file_returns_201(self, client, auth, mocker):
+        mocker.patch("src.utils.shell")
+        response = client.post("/filesystem/tmp/", headers=auth, data={
+            "files": (io.BytesIO(b"text"), "file.txt")
+        }, content_type="multipart/form-data")
+        assert response.status_code == 201
