@@ -205,7 +205,7 @@ class TestFilesystemPUT:
         assert response.status_code == 404
         assert response.json == {
             "code": 404,
-            "message": "file does not exist in given path",
+            "message": "file does not exist",
             "reason": "Not Found",
         }
 
