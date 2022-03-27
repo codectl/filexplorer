@@ -40,7 +40,8 @@ class TestFilesystemGET:
         assert response.json == {"code": 400, "message": "err", "reason": "Bad Request"}
 
     def test_permission_denied_returns_403(self, client, auth, mocker):
-        stderr = "ls: /tmp/root/: Permission denied"
+        stderr = "/tmp/root/: Permission denied"
+        stderr = "/tmp/root/: Permission denied"
         err = subprocess.CalledProcessError(cmd="", returncode=1, stderr=stderr)
         mocker.patch("src.utils.shell", side_effect=err)
         response = client.get("/filesystem/tmp/root/", headers=auth)
@@ -52,7 +53,7 @@ class TestFilesystemGET:
         }
 
     def test_missing_path_returns_404(self, client, auth, mocker):
-        stderr = "ls: /tmp/missing/: No such file or directory"
+        stderr = "/tmp/missing/: No such file or directory"
         err = subprocess.CalledProcessError(cmd="", returncode=1, stderr=stderr)
         mocker.patch("src.utils.shell", side_effect=err)
         response = client.get("/filesystem/tmp/missing/", headers=auth)
@@ -106,7 +107,7 @@ class TestFilesystemPOST:
         assert response.status_code == 201
 
     def test_path_not_a_directory_returns_400(self, client, auth, mocker):
-        stderr = "tee: /tmp/file.txt: Not a directory"
+        stderr = "/tmp/file.txt: Not a directory"
         err = subprocess.CalledProcessError(cmd="", returncode=1, stderr=stderr)
         mocker.patch("src.utils.shell", side_effect=err)
         response = client.post("/filesystem/tmp/file.txt", headers=auth, data={
@@ -122,7 +123,7 @@ class TestFilesystemPOST:
         assert response.status_code == 400
 
     def test_permission_denied_returns_403(self, client, auth, mocker):
-        stderr = "tee: /tmp/root/: Permission denied"
+        stderr = "/tmp/root/: Permission denied"
         err = subprocess.CalledProcessError(cmd="", returncode=1, stderr=stderr)
         mocker.patch("src.utils.shell", side_effect=err)
         response = client.post("/filesystem/tmp/root/", headers=auth, data={
@@ -136,7 +137,7 @@ class TestFilesystemPOST:
         }
 
     def test_missing_path_returns_404(self, client, auth, mocker):
-        stderr = "tee: /tmp/missing/: No such file or directory"
+        stderr = "/tmp/missing/: No such file or directory"
         err = subprocess.CalledProcessError(cmd="", returncode=1, stderr=stderr)
         mocker.patch("src.utils.shell", side_effect=err)
         response = client.post("/filesystem/tmp/missing/", headers=auth, data={
@@ -160,7 +161,7 @@ class TestFilesystemPUT:
         assert response.status_code == 204
 
     def test_create_file_outside_directory_returns_400(self, client, auth, mocker):
-        stderr = "tee: /tmp/file.txt: Not a directory"
+        stderr = "/tmp/file.txt: Not a directory"
         err = subprocess.CalledProcessError(cmd="", returncode=1, stderr=stderr)
         mocker.patch("src.utils.shell", side_effect=err)
         response = client.put("/filesystem/tmp/file.txt", headers=auth, data={
@@ -169,7 +170,7 @@ class TestFilesystemPUT:
         assert response.status_code == 400
 
     def test_permission_denied_returns_403(self, client, auth, mocker):
-        stderr = "tee: /tmp/root/: Permission denied"
+        stderr = "/tmp/root/: Permission denied"
         err = subprocess.CalledProcessError(cmd="", returncode=1, stderr=stderr)
         mocker.patch("src.utils.shell", side_effect=err)
         response = client.put("/filesystem/tmp/root/", headers=auth, data={
@@ -183,7 +184,7 @@ class TestFilesystemPUT:
         }
 
     def test_missing_path_returns_404(self, client, auth, mocker):
-        stderr = "tee: /tmp/missing/: No such file or directory"
+        stderr = "/tmp/missing/: No such file or directory"
         err = subprocess.CalledProcessError(cmd="", returncode=1, stderr=stderr)
         mocker.patch("src.utils.shell", side_effect=err)
         response = client.put("/filesystem/tmp/missing/", headers=auth, data={
