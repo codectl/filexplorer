@@ -46,9 +46,9 @@ class FilesystemAPI:
         for file in files:
             filename = secure_filename(file.filename)
             if update and filename not in path_files:
-                raise FileNotFoundError("file does not exist in given path")
+                raise FileNotFoundError("file does not exist")
             elif not update and filename in path_files:
-                raise FileExistsError("file already exists in given path")
+                raise FileExistsError("file already exists")
 
         for file in files:
             filename = secure_filename(file.filename)
@@ -83,6 +83,10 @@ class FilesystemAPI:
             raise FileNotFoundError(err)
         elif err == "permission denied":
             raise PermissionError(err)
+        elif err == "is a directory":
+            raise IsADirectoryError(err)
+        elif err == "not a directory":
+            raise NotADirectoryError(err)
         else:
             raise Exception(err)
 
