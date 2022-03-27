@@ -208,3 +208,42 @@ class TestFilesystemPUT:
             "message": "file does not exist in given path",
             "reason": "Not Found",
         }
+
+
+class TestFilesystemDELETE:
+
+    def test_valid_file_returns_204(self, client, auth, mocker):
+        mocker.patch("src.utils.shell")
+        response = client.delete("/filesystem/tmp/file.txt", headers=auth)
+        assert response.status_code == 204
+
+    def test_path_is_a_directory_returns_400(self, client, auth, mocker):
+        stderr = "/tmp/dir/: is a directory"
+        err = subprocess.CalledProcessError(cmd="", returncode=1, stderr=stderr)
+        mocker.patch("src.utils.shell", side_effect=err)
+        response = client.delete("/filesystem/tmp/dir/", headers=auth)
+        assert response.status_code == 400
+
+    def test_permission_denied_returns_403(self, client, auth, mocker):
+        stderr = "/tmp/root/: Permission denied"
+        err = subprocess.CalledProcessError(cmd="", returncode=1, stderr=stderr)
+        mocker.patch("src.utils.shell", side_effect=err)
+        response = client.delete("/filesystem/tmp/root/", headers=auth)
+        assert response.status_code == 403
+        assert response.json == {
+            "code": 403,
+            "message": "permission denied",
+            "reason": "Forbidden",
+        }
+
+    def test_delete_missing_file_returns_404(self, client, auth, mocker):
+        stderr = "/tmp/file.txt: No such file or directory"
+        err = subprocess.CalledProcessError(cmd="", returncode=1, stderr=stderr)
+        mocker.patch("src.utils.shell", side_effect=err)
+        response = client.delete("/filesystem/tmp/file.txt", headers=auth)
+        assert response.status_code == 404
+        assert response.json == {
+            "code": 404,
+            "message": "no such file or directory",
+            "reason": "Not Found",
+        }
