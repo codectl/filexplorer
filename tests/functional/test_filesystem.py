@@ -160,7 +160,7 @@ class TestFilesystemPUT:
         }, content_type="multipart/form-data")
         assert response.status_code == 204
 
-    def test_create_file_outside_directory_returns_400(self, client, auth, mocker):
+    def test_path_not_a_directory_returns_400(self, client, auth, mocker):
         stderr = "/tmp/file.txt: Not a directory"
         err = subprocess.CalledProcessError(cmd="", returncode=1, stderr=stderr)
         mocker.patch("src.utils.shell", side_effect=err)
