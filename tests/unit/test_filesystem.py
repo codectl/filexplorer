@@ -25,7 +25,7 @@ class TestFilesystemAPI:
         assert api.ls(path="/tmp/") == ["file.txt"]
 
     def test_ls_on_restricted_path_raises_exception(self, api, mocker):
-        stderr = "ls: /tmp/root/: Permission denied"
+        stderr = "/tmp/root/: Permission denied"
         err = subprocess.CalledProcessError(cmd="", returncode=1, stderr=stderr)
         mocker.patch("src.utils.shell", side_effect=err)
         with pytest.raises(PermissionError) as ex:
@@ -33,7 +33,7 @@ class TestFilesystemAPI:
         assert str(ex.value) == "permission denied"
 
     def test_ls_on_missing_file_raises_exception(self, api, mocker):
-        stderr = "ls: /tmp/file.txt: No such file or directory"
+        stderr = "/tmp/file.txt: No such file or directory"
         err = subprocess.CalledProcessError(cmd="", returncode=1, stderr=stderr)
         mocker.patch("src.utils.shell", side_effect=err)
         with pytest.raises(FileNotFoundError) as ex:
@@ -61,7 +61,7 @@ class TestFilesystemAPI:
         assert content.read() == io.BytesIO(b"content").read()
 
     def test_restricted_file_attachment_raises_exceptions(self, api, mocker):
-        stderr = "tar: Couldn't list extended attributes: Permission denied"
+        stderr = "Couldn't list extended attributes: Permission denied"
         err = subprocess.CalledProcessError(cmd="", returncode=1, stderr=stderr)
         mocker.patch("src.utils.shell", side_effect=err)
         with pytest.raises(PermissionError) as ex:
@@ -69,7 +69,7 @@ class TestFilesystemAPI:
         assert str(ex.value) == "permission denied"
 
     def test_restricted_directory_attachment_raises_exceptions(self, api, mocker):
-        stderr = "tar: Couldn't list extended attributes: Permission denied"
+        stderr = "Couldn't list extended attributes: Permission denied"
         err = subprocess.CalledProcessError(cmd="", returncode=1, stderr=stderr)
         mocker.patch("src.utils.shell", side_effect=err)
         with pytest.raises(PermissionError) as ex:
@@ -82,7 +82,7 @@ class TestFilesystemAPI:
         assert str(ex.value) == "unsupported file mode"
 
     def test_missing_file_attachment_raises_exceptions(self, api, mocker):
-        stderr = "tar: /tmp/file.txt: Cannot stat: No such file or directory"
+        stderr = "/tmp/file.txt: Cannot stat: No such file or directory"
         err = subprocess.CalledProcessError(cmd="", returncode=1, stderr=stderr)
         mocker.patch("src.utils.shell", side_effect=err)
         with pytest.raises(FileNotFoundError) as ex:
@@ -90,7 +90,7 @@ class TestFilesystemAPI:
         assert str(ex.value) == "no such file or directory"
 
     def test_missing_directory_attachment_raises_exceptions(self, api, mocker):
-        stderr = "tar: /tmp/dir/: Cannot stat: No such file or directory"
+        stderr = "/tmp/dir/: Cannot stat: No such file or directory"
         err = subprocess.CalledProcessError(cmd="", returncode=1, stderr=stderr)
         mocker.patch("src.utils.shell", side_effect=err)
         with pytest.raises(FileNotFoundError) as ex:
@@ -98,7 +98,7 @@ class TestFilesystemAPI:
         assert str(ex.value) == "no such file or directory"
 
     def test_error_attachment_raises_exceptions(self, api, mocker):
-        stderr = "tar: some error occurred"
+        stderr = "some error occurred"
         err = subprocess.CalledProcessError(cmd="", returncode=1, stderr=stderr)
         mocker.patch("src.utils.shell", side_effect=err)
         with pytest.raises(Exception) as ex:
@@ -114,8 +114,17 @@ class TestFilesystemAPI:
     def test_existing_file_upload_raises_exception(self, api, mocker):
         mocker.patch("src.utils.shell", return_value="file.txt")
         file = mocker.MagicMock(filename="file.txt")
-        with pytest.raises(FileExistsError):
+        with pytest.raises(FileExistsError) as ex:
             api.upload_files(path="/tmp/dir/", files=[file])
+        assert str(ex.value) == "file already exists"
+
+    def test_wrong_directory_file_upload_raises_exception(self, api, mocker):
+        stderr = "/tmp/file.txt/: Not a directory"
+        err = subprocess.CalledProcessError(cmd="", returncode=1, stderr=stderr)
+        mocker.patch("src.utils.shell", side_effect=err)
+        with pytest.raises(NotADirectoryError) as ex:
+            api.upload_files(path="/tmp/file.txt", files=[])
+        assert str(ex.value) == "not a directory"
 
     def test_valid_file_update(self, api, mocker):
         mocker.patch("src.utils.shell", return_value="file.txt")
@@ -126,5 +135,34 @@ class TestFilesystemAPI:
     def test_missing_file_update_raises_exception(self, api, mocker):
         mocker.patch("src.utils.shell")
         file = mocker.MagicMock(filename="file.txt")
-        with pytest.raises(FileNotFoundError):
+        with pytest.raises(FileNotFoundError) as ex:
             api.upload_files(path="/tmp/dir/", files=[file], update=True)
+        assert str(ex.value) == "file does not exist"
+
+    def test_valid_file_delete(self, api, mocker):
+        mocker.patch("src.utils.shell")
+        api.delete_file(path="/tmp/file.txt")
+
+    def test_delete_missing_file_raises_exception(self, api, mocker):
+        stderr = "/tmp/file.txt: No such file or directory"
+        err = subprocess.CalledProcessError(cmd="", returncode=1, stderr=stderr)
+        mocker.patch("src.utils.shell", side_effect=err)
+        with pytest.raises(FileNotFoundError) as ex:
+            api.delete_file(path="/tmp/file.txt")
+        assert str(ex.value) == "no such file or directory"
+
+    def test_delete_directory_raises_exception(self, api, mocker):
+        stderr = "/tmp/dir/: is a directory"
+        err = subprocess.CalledProcessError(cmd="", returncode=1, stderr=stderr)
+        mocker.patch("src.utils.shell", side_effect=err)
+        with pytest.raises(IsADirectoryError) as ex:
+            api.delete_file(path="/tmp/dir/")
+        assert str(ex.value) == "is a directory"
+
+    def test_restricted_file_delete_raises_exceptions(self, api, mocker):
+        stderr = "/tmp/file.txt: Permission denied"
+        err = subprocess.CalledProcessError(cmd="", returncode=1, stderr=stderr)
+        mocker.patch("src.utils.shell", side_effect=err)
+        with pytest.raises(PermissionError) as ex:
+            assert api.delete_file(path="/tmp/file.txt")
+        assert str(ex.value) == "permission denied"
