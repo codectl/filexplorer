@@ -60,6 +60,13 @@ class FilesystemAPI:
                 user=self.username,
             )
 
+    def delete_file(self, path):
+        self._run(
+            cmd=f"rm {path}",
+            stdout=subprocess.DEVNULL,
+            user=self.username,
+        )
+
     @classmethod
     def _run(cls, cmd, **kwargs):
         try:

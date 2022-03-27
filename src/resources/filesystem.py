@@ -84,7 +84,7 @@ class Filesystem(Resource):
           schema:
             type: string
           required: true
-          description: the path to create the resource at
+          description: the directory to create the resource at
         tags:
             - filesystem
         security:
@@ -148,7 +148,7 @@ class Filesystem(Resource):
           schema:
             type: string
           required: true
-          description: the path to update the resource at
+          description: the directory to update the resource at
         tags:
             - filesystem
         security:
@@ -193,6 +193,54 @@ class Filesystem(Resource):
 
         try:
             fs_api.upload_files(path=path, files=files, update=True)
+            return utils.http_response(204), 204
+        except PermissionError as ex:
+            utils.abort_with(code=403, message=str(ex))
+        except FileNotFoundError as ex:
+            utils.abort_with(code=404, message=str(ex))
+        except Exception as ex:
+            utils.abort_with(code=400, message=str(ex))
+
+    @requires_auth(schemes=["basic"])
+    def delete(self, path):
+        """
+        Delete file in given path.
+        ---
+        parameters:
+        - in: path
+          name: path
+          schema:
+            type: string
+          required: true
+          description: the path of the file
+        tags:
+            - filesystem
+        security:
+            - BasicAuth: []
+        responses:
+            204:
+                content:
+                    application/json:
+                        schema:
+                            "$ref": "#/components/schemas/HttpResponse"
+
+            400:
+                $ref: "#/components/responses/BadRequest"
+            401:
+                $ref: "#/components/responses/Unauthorized"
+            403:
+                $ref: "#/components/responses/Forbidden"
+            404:
+                $ref: "#/components/responses/NotFound"
+        """
+        path = utils.normpath(path)
+        username = current_username
+        fs_api = FilesystemAPI(username=username)
+        if not any(path.startswith(p) for p in fs_api.supported_paths()):
+            utils.abort_with(code=400, message="unsupported path")
+
+        try:
+            fs_api.delete_file(path=path)
             return utils.http_response(204), 204
         except PermissionError as ex:
             utils.abort_with(code=403, message=str(ex))
