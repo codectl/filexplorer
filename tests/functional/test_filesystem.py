@@ -41,7 +41,6 @@ class TestFilesystemGET:
 
     def test_permission_denied_returns_403(self, client, auth, mocker):
         stderr = "/tmp/root/: Permission denied"
-        stderr = "/tmp/root/: Permission denied"
         err = subprocess.CalledProcessError(cmd="", returncode=1, stderr=stderr)
         mocker.patch("src.utils.shell", side_effect=err)
         response = client.get("/filesystem/tmp/root/", headers=auth)
