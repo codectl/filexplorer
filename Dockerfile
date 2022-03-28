@@ -46,6 +46,10 @@ COPY src/ src/
 COPY --from=builder /app/dist .
 RUN pip install *.whl
 
+# create system user
+ENV USER filexplorer
+RUN useradd --system -u 1000 $USER
+
 # run process as non root
 USER 1000:1000
 
