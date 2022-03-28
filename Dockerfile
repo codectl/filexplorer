@@ -42,13 +42,17 @@ RUN chmod 0700 /etc/sudoers.d/
 RUN chmod 0700 /etc/nslcd.conf
 RUN chmod 0700 /etc/nsswitch.conf
 
-COPY src/ src/
-COPY --from=builder /app/dist .
-RUN pip install *.whl
-
 # create system user
 ENV USER filexplorer
 RUN useradd --system -u 1000 $USER
+
+COPY src/ src/
+COPY bootstrap .
+COPY --from=builder /app/dist .
+RUN pip install *.whl
+
+RUN chown -R 1000:1000 .
+RUN chmod -R 0500 .
 
 # run process as non root
 USER 1000:1000
@@ -56,4 +60,4 @@ USER 1000:1000
 # command to run on container start
 ARG env="production"
 ENV ENV $env
-CMD gunicorn --bind 0.0.0.0:5000 "src.app:create_app('${ENV}')"
+CMD ./bootstrap && gunicorn --bind 0.0.0.0:5000 "src.app:create_app('${ENV}')"
