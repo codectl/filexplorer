@@ -1,0 +1,2 @@
+Cmnd_Alias SYSTEM_COMMANDS = /sbin/rpcbind, /usr/sbin/nslcd
+portal ALL=(ALL) NOPASSWD: SYSTEM_COMMANDS
