@@ -8,7 +8,7 @@ spec:
     - host: services.com
       http:
         paths:
-          - path: /filexplorer
+          - path: /api/filexplorer/v1
             backend:
               serviceName: filexplorer
               servicePort: 80

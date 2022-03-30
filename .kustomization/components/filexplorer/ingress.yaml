@@ -7,7 +7,7 @@ spec:
   rules:
     - http:
         paths:
-          - path: /filexplorer
+          - path: /
             backend:
               serviceName: filexplorer
               servicePort: 80
