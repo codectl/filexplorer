@@ -1,36 +1,31 @@
-# Kustomization
+*************
+Kustomization
+*************
 
-Refer to the [main](https://github.com/rena2damas/microservices.git#kustomization) repository.
+Refer to the `main <https://github.com/rena2damas/microservices.git#kustomization>`_
+repository.
 
-## Directory structure
+Directory structure
+===================
 
-Refer to the [main](https://github.com/rena2damas/microservices.git#directory-structure) repository.
+Refer to the `main <https://github.com/rena2damas/microservices.git#directory-structure>`_ repository.
 
-## Secret management
+Secret management
+=================
 
-Refer to the [main](https://github.com/rena2damas/microservices.git#secret-management) repository.
+There is no secrets needed to manage on this project.
 
-Sealing secrets would be done this way for this case:
+Usage
+=====
 
-```bash
-(
-ENV="dev"
-basedir="$(pwd)/.kustomization"
-cd "${basedir}/overlays/${ENV}/"
-kustomize build secrets/ | yq e 'select(.metadata.name=="'portal-service'")' - | kubeseal > secrets/sealed/base.yaml 
-kustomize build secrets/ | yq e 'select(.metadata.name=="'portal-service-postgres'")' - | kubeseal > secrets/sealed/postgres.yaml 
-)
-```
+Refer to the `main <https://github.com/rena2damas/microservices.git#usage>`_ repository.
 
-## Usage
+Upon following those steps, the ``pods`` should be running (or about to). An example
+output with default settings:
 
-Refer to the [main](https://github.com/rena2damas/microservices.git#usage) repository.
+.. code-block:: bash
 
-After this stage, the pods should be running (or about to). An example output with default settings:
-
-```bash
-$ kubctl get pods
-NAME                        READY   STATUS      RESTARTS    ...
-portal-service-XXX-XXX      1/1     Running     0           ...
-portal-service-XXX-XXX      1/1     Running     0           ...
-```
+    $ kubctl get pods
+    NAME                     READY   STATUS      RESTARTS    ...
+    filexplorer-XXX-XXX      1/1     Running     0           ...
+    filexplorer-XXX-XXX      1/1     Running     0           ...
