@@ -1,0 +1,13 @@
+---
+apiVersion: networking.k8s.io/v1beta1
+kind: Ingress
+metadata:
+  name: filexplorer
+spec:
+  rules:
+    - http:
+        paths:
+          - path: /filexplorer
+            backend:
+              serviceName: filexplorer
+              servicePort: 80
