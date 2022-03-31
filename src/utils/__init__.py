@@ -14,6 +14,9 @@ def normpath(path):
 
 
 def shell(cmd, universal_newlines=True, **kwargs):
+    user = kwargs.pop("user", None)
+    if user:
+        cmd = f"sudo -u {user} {cmd}"
     popen = subprocess.Popen(
         cmd.split(),
         stdin=kwargs.pop("stdin", subprocess.PIPE),
