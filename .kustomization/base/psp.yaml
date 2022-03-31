@@ -11,7 +11,7 @@ spec:
   privileged: false
   allowPrivilegeEscalation: true
 
-  allowedCapabilities: [ SETUID, SETGID ]
+  allowedCapabilities: [ ]
   requiredDropCapabilities: [ ]
   defaultAddCapabilities: [ ]
 

@@ -50,6 +50,6 @@ spec:
             runAsUser: 1000
             runAsGroup: 1000
             capabilities:
-              add: [ SETUID, SETGID ]
+              add: [ ]
       serviceAccountName: filexplorer
       restartPolicy: Always
