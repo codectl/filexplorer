@@ -44,4 +44,5 @@ spec:
     - secret
     - emptyDir
     - persistentVolumeClaim
+    - hostPath
   readOnlyRootFilesystem: false
