@@ -1,2 +1,2 @@
-Cmnd_Alias SYSTEM_COMMANDS = /usr/sbin/nslcd
+Cmnd_Alias SYSTEM_COMMANDS = /usr/sbin/nslcd, /bin/ls, /usr/bin/tee
 filexplorer ALL=(ALL) NOPASSWD: SYSTEM_COMMANDS
