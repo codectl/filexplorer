@@ -6,7 +6,7 @@ metadata:
 data:
 
     # application root context
-    APPLICATION_ROOT: /
+    APPLICATION_ROOT: /api/filexplorer/v1
 
     # OPENAPI supported version
     OPENAPI: 3.0.3
