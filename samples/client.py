@@ -21,7 +21,7 @@ r = requests.post(
     url=f"{base_url}/filesystem/{directory}",
     headers={"accept": "application/json"},
     auth=(username, password),
-    files={"files": (filename, tmp)}
+    files={"files": (filename, tmp)},
 )
 
 tmp.close()  # delete file
@@ -32,7 +32,7 @@ assert r.status_code in (201, 400)  # file may already exist
 r = requests.get(
     url=f"{base_url}/filesystem/{directory}/",
     headers={"accept": "application/json"},
-    auth=(username, password)
+    auth=(username, password),
 )
 
 assert r.status_code == 200
@@ -44,7 +44,7 @@ r = requests.get(
     url=f"{base_url}/filesystem/{directory}/{filename}",
     headers={"accept": "application/octet-stream"},
     auth=(username, password),
-    stream=True
+    stream=True,
 )
 
 assert r.status_code == 200
