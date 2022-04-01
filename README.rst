@@ -2,8 +2,8 @@
 filexplorer
 ***********
 
-.. image:: https://github.com/rena2damas/rena2damas/actions/workflows/ci.yaml/badge.svg
-    :target: https://github.com/rena2damas/rena2damas/actions/workflows/ci.yaml
+.. image:: https://github.com/rena2damas/filexplorer/actions/workflows/ci.yaml/badge.svg
+    :target: https://github.com/rena2damas/filexplorer/actions/workflows/ci.yaml
     :alt: CI
 .. image:: https://codecov.io/gh/rena2damas/filexplorer/branch/master/graph/badge.svg
     :target: https://app.codecov.io/gh/rena2damas/filexplorer/branch/master
